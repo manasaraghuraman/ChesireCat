@@ -1,0 +1,13 @@
+/*
+ * File: app/globals.css
+ * Purpose: Tailwind entry and base page styles.
+ * Author: manasa
+ * Date: 2026-11-21
+ */
+@import "tailwindcss";
+
+body {
+  background: #1b1030;
+  color: #f5ecd7;
+  font-family: Georgia, "Times New Roman", serif;
+}
