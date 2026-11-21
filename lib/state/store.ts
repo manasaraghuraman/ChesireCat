@@ -6,9 +6,24 @@
  */
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { REWINDS_PER_LEVEL, SIZE_MAX, SIZE_MIN, SIZE_START, STORAGE_KEY } from "../constants";
+import { REWINDS_PER_LEVEL, SIZE_MAX, SIZE_MIN, SIZE_START, SIZE_TOO_SMALL, STORAGE_KEY } from "../constants";
 import { LEVEL_IDS } from "../constants";
-import { GameState, type GameStateType, type KeyPieceType, type LevelIdType } from "../schemas";
+import {
+  GameState,
+  type GameStateType,
+  type KeyPieceType,
+  type LevelIdType,
+  type RefereeVerdictType,
+} from "../schemas";
+
+/** What happened when a Referee verdict was applied, for UI feedback. */
+export interface VerdictOutcome {
+  readonly sizeBefore: number;
+  readonly sizeAfter: number;
+  readonly keyAwarded: boolean;
+  /** The key was earned but Alice is too small to reach it (spec §3.1). */
+  readonly tooSmallForKey: boolean;
+}
 
 interface Actions {
   readonly changeSize: (delta: number) => void;
@@ -16,6 +31,7 @@ interface Actions {
   readonly useRewind: (level: LevelIdType) => boolean;
   readonly goToLevel: (level: LevelIdType) => void;
   readonly addLesson: (lesson: string) => void;
+  readonly applyVerdict: (piece: KeyPieceType, verdict: RefereeVerdictType) => VerdictOutcome;
   readonly reset: () => void;
 }
 
@@ -47,6 +63,18 @@ export const useGameStore = create<GameStore>()(
       },
       goToLevel: (level) => set({ currentLevel: level }),
       addLesson: (lesson) => set((s) => ({ lessons: [...s.lessons, lesson] })),
+      applyVerdict: (piece, verdict) => {
+        const { size: sizeBefore, keys, lessons } = get();
+        const sizeAfter = clampSize(sizeBefore + verdict.sizeDelta);
+        const canReachKey = sizeAfter >= SIZE_TOO_SMALL;
+        const keyAwarded = verdict.keyEarned && canReachKey && !keys.includes(piece);
+        set({
+          size: sizeAfter,
+          ...(keyAwarded ? { keys: [...keys, piece] } : {}),
+          ...(keyAwarded && verdict.lesson ? { lessons: [...lessons, verdict.lesson] } : {}),
+        });
+        return { sizeBefore, sizeAfter, keyAwarded, tooSmallForKey: verdict.keyEarned && !canReachKey };
+      },
       reset: () => set(createInitialState()),
     }),
     {

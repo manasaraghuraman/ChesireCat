@@ -19,3 +19,16 @@ export const LEVEL_IDS = ["fall", "caterpillar", "cheshire", "hatter", "queen", 
 
 export const SCENE_FALL = "Fall";
 export const SCENE_HALL = "HallOfDoors";
+export const SCENE_CHESHIRE = "Cheshire";
+
+/** Size change ranges the Referee's sizeDelta is clamped to, by outcome (spec §3.1). */
+export const SIZE_DELTA_RESISTED = { min: 5, max: 20 } as const;
+export const SIZE_DELTA_FELL = { min: -25, max: -15 } as const;
+export const SIZE_DELTA_NEUTRAL = { min: -5, max: 5 } as const;
+
+/** Dialogue limits for /api/npc/*. */
+export const NPC_MAX_TURNS = 20;
+export const NPC_MAX_TEXT = 500;
+/** How many recent turns the NPC and Referee see. */
+export const NPC_CONTEXT_TURNS = 8;
+export const NPC_RATE_LIMIT_PER_MINUTE = 20;

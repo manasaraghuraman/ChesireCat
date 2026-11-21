@@ -10,6 +10,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@ai-sdk/groq": "4.0.77",
+    "ai": "7.0.164",
     "next": "16.4.6",
     "phaser": "3.90.0",
     "react": "19.3.1",

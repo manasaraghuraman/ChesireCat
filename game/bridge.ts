@@ -6,6 +6,8 @@
  */
 export interface BridgeEvents {
   readonly "scene-changed": string;
+  /** React asks the active level scene to return to the Hall of Doors. */
+  readonly "exit-level": null;
 }
 
 type Handler<K extends keyof BridgeEvents> = (payload: BridgeEvents[K]) => void;

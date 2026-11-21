@@ -5,7 +5,7 @@
  * Date: 2026-11-21
  */
 import * as Phaser from "phaser";
-import { GAME_HEIGHT, GAME_WIDTH, KEY_PIECES, SCENE_HALL } from "../../lib/constants";
+import { GAME_HEIGHT, GAME_WIDTH, KEY_PIECES, SCENE_CHESHIRE, SCENE_HALL } from "../../lib/constants";
 import { useGameStore } from "../../lib/state/store";
 import { emit } from "../bridge";
 
@@ -18,6 +18,10 @@ const DEMO_UNLOCKED_DOOR = "cheshire";
 const COLOR_LOCKED = 0x555555;
 const COLOR_OPEN = 0x8b5a2b;
 const COLOR_GARDEN = 0x44cc66;
+const COLOR_EARNED = 0xffd700;
+
+/** Doors that lead somewhere playable in this build. */
+const DOOR_SCENES: Partial<Record<string, string>> = { cheshire: SCENE_CHESHIRE };
 
 export class HallOfDoorsScene extends Phaser.Scene {
   constructor() {
@@ -37,8 +41,22 @@ export class HallOfDoorsScene extends Phaser.Scene {
     KEY_PIECES.forEach((piece, index) => {
       const x = startX + index * DOOR_SPACING;
       const isUnlocked = piece === DEMO_UNLOCKED_DOOR;
-      this.add.rectangle(x, DOOR_Y, DOOR_WIDTH, DOOR_HEIGHT, isUnlocked ? COLOR_OPEN : COLOR_LOCKED);
-      this.add.text(x, DOOR_Y + DOOR_HEIGHT / 2 + 14, piece, { fontSize: "14px" }).setOrigin(0.5);
+      const isEarned = useGameStore.getState().keys.includes(piece);
+      const door = this.add.rectangle(
+        x,
+        DOOR_Y,
+        DOOR_WIDTH,
+        DOOR_HEIGHT,
+        isEarned ? COLOR_EARNED : isUnlocked ? COLOR_OPEN : COLOR_LOCKED,
+      );
+      const label = isEarned ? `${piece} ✓` : piece;
+      this.add.text(x, DOOR_Y + DOOR_HEIGHT / 2 + 14, label, { fontSize: "14px" }).setOrigin(0.5);
+      const target = DOOR_SCENES[piece];
+      if (isUnlocked && target) {
+        door.setInteractive({ useHandCursor: true });
+        door.on("pointerdown", () => this.scene.start(target));
+        this.add.text(x, DOOR_Y, "Enter", { fontSize: "14px" }).setOrigin(0.5);
+      }
     });
   }
 }
