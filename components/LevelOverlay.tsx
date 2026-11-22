@@ -10,14 +10,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { emit, on, type BridgeEvents } from "@/game/bridge";
-import { SCENE_CHESHIRE, SCENE_MAZE, SCENE_CLUES } from "@/lib/constants";
+import { SCENE_CHESHIRE, SCENE_MAZE, SCENE_CLUES, SCENE_GARDEN } from "@/lib/constants";
 import { useGameStore } from "@/lib/state/store";
 import LessonCard from "./LessonCard";
 
 type Hint = BridgeEvents["hint"];
 type Won = BridgeEvents["game-won"];
 
-const MINI_GAME_SCENES: ReadonlySet<string> = new Set([SCENE_CHESHIRE, SCENE_MAZE, SCENE_CLUES]);
+const MINI_GAME_SCENES: ReadonlySet<string> = new Set([SCENE_CHESHIRE, SCENE_MAZE, SCENE_CLUES, SCENE_GARDEN]);
 const TONE_CLASS: Readonly<Record<Hint["tone"], string>> = {
   info: "bg-black/80 text-amber-50",
   good: "bg-emerald-800/95 text-white",

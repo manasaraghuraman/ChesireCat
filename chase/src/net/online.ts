@@ -1,49 +1,66 @@
-/**
- * File: chase/src/net/online.ts
- * Purpose: Offline stand-in for the original Supabase leaderboard client. The carbon chase is embedded in
- *          the main game and never talks to a server, so every online feature reports "Offline" and the
- *          rest of the game falls back to local saves, exactly as it did without Supabase credentials.
- * Author: manasa
- * Date: 2026-11-22 (replaces the optional Supabase client; same exports)
- */
+import { createClient } from "@supabase/supabase-js";
 import type { LevelRun } from "../level/run";
 import type { LevelId } from "../config/courses";
-import type { Track } from "../replay/codec";
-
-/** The one call shape other code uses; it never exists in this build. */
-interface OnlineClient {
-  functions: {
-    invoke(
-      name: string,
-      options: { body: unknown },
-    ): Promise<{ data: { line: string; tip: string } | null; error: unknown }>;
-  };
-}
-
-/** Always null: there is no online backend in this build. */
-export const online = null as OnlineClient | null;
-
+import { decode, encode, type Track } from "../replay/codec";
+import { ringTicks } from "../config/ring";
+const url = import.meta.env.VITE_SUPABASE_URL,
+  key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const online = url && key ? createClient(url, key) : null;
 let name = "";
-
-export function displayName(): string {
+try {
+  name = localStorage.getItem("rabbit.display-name") ?? "";
+} catch {
+  /* Private browsing. */
+}
+export function displayName() {
   return name;
 }
-
-export function chooseName(value: string): void {
+export function chooseName(value: string) {
   name = value.trim().slice(0, 24);
+  try {
+    localStorage.setItem("rabbit.display-name", name);
+  } catch {
+    /* Use session name. */
+  }
 }
-
-export function identity(): Promise<string> {
-  return Promise.reject(new Error("Offline"));
+let signing: Promise<string> | undefined;
+export function identity() {
+  return (signing ??= signIn().finally(() => {
+    signing = undefined;
+  }));
 }
-
+async function signIn() {
+  if (!online) throw Error("Offline");
+  const session = await online.auth.getSession();
+  if (session.data.session) return session.data.session.user.id;
+  const { data, error } = await online.auth.signInAnonymously();
+  if (error || !data.user) throw Error("Sign-in unavailable");
+  return data.user.id;
+}
 export let submission: Promise<boolean> = Promise.resolve(false);
-
-/** Runs are never submitted; the local save keeps the personal best. */
-export function submit(_run: LevelRun, _track: Track): void {
-  submission = Promise.resolve(false);
+export function submit(run: LevelRun, track: Track) {
+  if (!online || !name || run.challenge) {
+    submission = Promise.resolve(false);
+    return;
+  }
+  const body = {
+    name,
+    level: run.level.id,
+    ticks: run.ticks,
+    optional: run.level.leaks
+      .filter((l) => !l.required)
+      .flatMap((l, i) =>
+        run.progress[run.level.leaks.indexOf(l)] === ringTicks ? [i] : [],
+      ),
+    ghost: encode(track),
+  };
+  submission = identity()
+    .then(
+      async () =>
+        !(await online.functions.invoke("submit_run", { body })).error,
+    )
+    .catch(() => false);
 }
-
 export interface Row {
   player_id: string;
   place: number;
@@ -51,13 +68,27 @@ export interface Row {
   final_time_ms: number;
   ghost_path: string;
 }
-
-export function scores(_id: LevelId): Promise<{ top: Row[]; own: Row | null }> {
-  return Promise.reject(new Error("Offline"));
+export async function scores(id: LevelId) {
+  if (!online) throw Error("Offline");
+  const query = () =>
+    online
+      .from("leaderboard")
+      .select("player_id,place,display_name,final_time_ms,ghost_path")
+      .eq("level_id", id);
+  const uid = name ? await identity().catch(() => null) : null;
+  const [top, own] = await Promise.all([
+    query().order("place").order("player_id").limit(20),
+    uid ? query().eq("player_id", uid).maybeSingle() : null,
+  ]);
+  if (top.error || own?.error) throw Error("Leaderboard unavailable");
+  return { top: top.data as Row[], own: own?.data as Row | null };
 }
-
 export const opponents = new Map<LevelId, Track>();
-
-export function downloadGhost(_id: LevelId, _path: string): Promise<void> {
-  return Promise.reject(new Error("Offline"));
+export async function downloadGhost(id: LevelId, path: string) {
+  if (!online) throw Error("Offline");
+  const { data, error } = await online.storage.from("ghosts").download(path);
+  if (error || !data || data.size > 2097152) throw Error("Ghost unavailable");
+  const track = decode(JSON.parse(await data.text()));
+  if (!track) throw Error("Invalid ghost");
+  opponents.set(id, track);
 }

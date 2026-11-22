@@ -19,7 +19,13 @@ const config: NextConfig = {
   reactStrictMode: true,
   serverExternalPackages: SERVER_EXTERNAL_PACKAGES,
   async headers() {
-    return [{ source: "/(.*)", headers: [...SECURITY_HEADERS] }];
+    return [
+      { source: "/(.*)", headers: [...SECURITY_HEADERS] },
+      {
+        source: "/chase/index.html",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
+      },
+    ];
   },
 };
 

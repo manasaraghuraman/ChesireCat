@@ -6,7 +6,11 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { Group, PerspectiveCamera, Scene } from "three";
+import { emit, on } from "../game/bridge";
+import { SCENE_GARDEN, SCENE_HALL } from "../lib/constants";
+import { createGardenZone } from "./zones/garden";
 import { parseLevel } from "./level";
 import { cleanSettings, DEFAULT_SETTINGS, loadSettings, saveSettings, SETTINGS_KEY } from "./settings";
 import { KEY_HEIGHT } from "./sizing";
@@ -66,9 +70,41 @@ describe("hall", () => {
 });
 
 describe("shipped levels", () => {
-  it.each(["hall", "cheshire", "maze", "clues"])("%s parses", (id) => {
+  it.each(["hall", "cheshire", "maze", "clues", "garden"])("%s parses", (id) => {
     expect(level(id).id).toBe(id);
   });
+});
+
+it("opens the chase from the garden door and returns to the Hall", () => {
+  vi.stubGlobal("document", { createElement: () => ({ getContext: () => null }) });
+  const zone = createGardenZone();
+  const opened = vi.fn();
+  const goTo = vi.fn();
+  const off = on("chase-open", opened);
+  try {
+    zone.enter({
+      root: new Group(),
+      scene: new Scene(),
+      camera: new PerspectiveCamera(),
+      level: level("garden"),
+      reducedMotion: false,
+      goTo,
+      setInteractables: vi.fn(),
+      setCinematic: vi.fn(),
+      lookAt: vi.fn(),
+      openDialogue: vi.fn(),
+      eyePosition: () => [0, 1.5, -10],
+    });
+    emit("interact", { id: "carbon-chase-door" });
+    expect(opened).toHaveBeenCalledOnce();
+    emit("exit-level", null);
+    expect(goTo).toHaveBeenCalledWith(SCENE_HALL);
+    expect(zone.id).toBe(SCENE_GARDEN);
+  } finally {
+    zone.exit();
+    off();
+    vi.unstubAllGlobals();
+  }
 });
 
 describe("settings", () => {

@@ -9,7 +9,7 @@
 
 import { useEffect, useState } from "react";
 import { on } from "@/game/bridge";
-import { GARDEN_KEYS, KEY_PIECES, SCENE_CHESHIRE, SCENE_FALL, SCENE_HALL, SCENE_MAZE, SCENE_CLUES } from "@/lib/constants";
+import { GARDEN_KEYS, KEY_PIECES, SCENE_CHESHIRE, SCENE_FALL, SCENE_HALL, SCENE_MAZE, SCENE_CLUES, SCENE_GARDEN } from "@/lib/constants";
 import type { KeyPieceType } from "@/lib/schemas";
 import { useGameStore } from "@/lib/state/store";
 import InteractPrompt from "./InteractPrompt";
@@ -32,6 +32,7 @@ export function objectiveFor(scene: string | null, keys: readonly KeyPieceType[]
   if (scene === SCENE_HALL) {
     return earned === GARDEN_KEYS.length ? "You have all 3 keys: open the tiny garden door!" : `Win each open door's mini game for a key (${earned}/${GARDEN_KEYS.length})`;
   }
+  if (scene === SCENE_GARDEN) return "Follow the White Rabbit through the Carbon Chase door";
   if (scene === SCENE_CHESHIRE) return hasCheshire ? "Return to the Hall (press H)" : "Press E on the Cat, then read the signposts and pick the lower-carbon way";
   if (scene === SCENE_MAZE) return "Walk up to the boards: collect 3 low-carbon choices (avoid the high-carbon ones), then reach the exit";
   if (scene === SCENE_CLUES) return "Read the cards, then pick the 3 real greenwash red flags";

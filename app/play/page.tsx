@@ -5,6 +5,7 @@
  * Author: manasa
  * Date: 2026-11-21
  */
+import CarbonChase from "@/components/CarbonChase";
 import BrowserPanel from "@/components/BrowserPanel";
 import FallPopup from "@/components/FallPopup";
 import Hud from "@/components/Hud";
@@ -28,6 +29,7 @@ export default function PlayPage() {
       <PauseMenu />
       <RewindEffect />
       <DevPanel />
+      <CarbonChase />
     </main>
   );
 }

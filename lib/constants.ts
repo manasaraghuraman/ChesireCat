@@ -22,6 +22,7 @@ export const SCENE_HALL = "HallOfDoors";
 export const SCENE_CHESHIRE = "Cheshire";
 export const SCENE_MAZE = "Maze";
 export const SCENE_CLUES = "Clues";
+export const SCENE_GARDEN = "Garden";
 
 /** Size change ranges the Referee's sizeDelta is clamped to, by outcome (spec §3.1). */
 export const SIZE_DELTA_RESISTED = { min: 5, max: 20 } as const;

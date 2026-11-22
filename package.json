@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build:chase": "npm --prefix chase ci && npm --prefix chase run build",
-    "test:chase": "npm --prefix chase test"
+    "test:chase": "npm --prefix chase test",
+    "predev": "npm run build:chase",
+    "prebuild": "npm run build:chase"
   },
   "dependencies": {
     "@ai-sdk/groq": "4.0.77",

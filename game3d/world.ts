@@ -348,6 +348,7 @@ export async function createWorld(canvas: HTMLCanvasElement, options: WorldOptio
   window.addEventListener("blur", pause);
   const offs = [
     on("capture-request", () => void capture()),
+    on("chase-open", pause),
     on("dialogue-close", () => {
       if (mode === "dialogue") setMode("paused");
     }),

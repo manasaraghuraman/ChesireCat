@@ -1,0 +1,30 @@
+{
+  "id": "garden",
+  "name": "The Garden",
+  "spawn": { "pos": [0, 0, 2], "yaw": 0 },
+  "geometry": [
+    { "shape": "box", "pos": [0, -0.5, -5], "size": [14, 1, 20], "tags": ["floor"] },
+    { "shape": "box", "pos": [-7, 0.9, -5], "size": [0.55, 1.8, 20], "tags": ["wall"] },
+    { "shape": "box", "pos": [7, 0.9, -5], "size": [0.55, 1.8, 20], "tags": ["wall"] },
+    { "shape": "box", "pos": [0, 0.9, 5], "size": [14, 1.8, 0.55], "tags": ["wall"] },
+    { "shape": "box", "pos": [0, 0.9, -15], "size": [14, 1.8, 0.55], "tags": ["wall"] }
+  ],
+  "interactables": [
+    {
+      "id": "carbon-chase-door",
+      "kind": "door",
+      "pos": [0, 1.25, -11.15],
+      "radius": 1.65,
+      "label": "Follow the Rabbit into Carbon Chase",
+      "enabled": true
+    },
+    {
+      "id": "garden-return",
+      "kind": "door",
+      "pos": [0, 1.25, 4.35],
+      "radius": 1.65,
+      "label": "Return to the Hall of Doors",
+      "enabled": true
+    }
+  ]
+}

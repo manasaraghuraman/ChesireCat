@@ -128,7 +128,7 @@ export const useGameStore = create<GameStore>()(
     }),
     {
       name: STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => window.localStorage),
       merge: (persisted, current) => {
         const parsed = GameState.safeParse(persisted);
         return parsed.success ? { ...current, ...parsed.data } : current;

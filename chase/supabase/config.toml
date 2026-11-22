@@ -1,0 +1,7 @@
+project_id = "down-the-rabbit-hole"
+[auth]
+enable_anonymous_sign_ins = true
+[functions.submit_run]
+verify_jwt = false
+[functions.cheshire_commentary]
+verify_jwt = false

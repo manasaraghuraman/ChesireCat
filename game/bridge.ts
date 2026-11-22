@@ -19,6 +19,8 @@ export interface BridgeEvents {
   readonly "scene-changed": string;
   /** React asks the active level scene to return to the Hall of Doors. */
   readonly "exit-level": null;
+  /** Garden door → host: enter Carbon Chase. */
+  readonly "chase-open": null;
   /** World → HUD: what the reticle is on (null when nothing). */
   readonly "focus-changed": FocusPayload | null;
   /** World → React/zone: E pressed on the focused, enabled, reachable thing. */

@@ -8,10 +8,9 @@
  */
 import * as THREE from "three";
 import { emit, on } from "../../game/bridge";
-import { GARDEN_KEYS, KEY_PIECES, SCENE_CHESHIRE, SCENE_HALL, SCENE_MAZE, SCENE_CLUES } from "../../lib/constants";
+import { GARDEN_KEYS, KEY_PIECES, SCENE_CHESHIRE, SCENE_HALL, SCENE_MAZE, SCENE_CLUES, SCENE_GARDEN } from "../../lib/constants";
 import type { KeyPieceType } from "../../lib/schemas";
 import { useGameStore } from "../../lib/state/store";
-import { GARDEN_LESSON } from "../../lib/carbonContent";
 import { createDoor, type Door } from "../entities/door";
 import { createKeyTable } from "../entities/keyTable";
 import { createWhiteRabbit, type WhiteRabbit } from "../entities/whiteRabbit";
@@ -114,6 +113,7 @@ export function createHallZone(): Zone {
   let table: ReturnType<typeof createKeyTable> | null = null;
   let rabbit: WhiteRabbit | null = null;
   let reduced = false;
+  let enterGarden: (() => void) | null = null;
   let eye: ZoneContext["eyePosition"] | null = null;
   let isNearGarden = false;
 
@@ -124,6 +124,7 @@ export function createHallZone(): Zone {
       useGameStore.getState().goToLevel("caterpillar"); // as the Phaser hub did
       reduced = ctx.reducedMotion;
       eye = ctx.eyePosition;
+      enterGarden = () => ctx.goTo(SCENE_GARDEN);
       isNearGarden = false;
       ctx.scene.background = new THREE.Color(0x1d1428);
       ctx.scene.fog = new THREE.Fog(0x1d1428, 18, 45);
@@ -200,7 +201,7 @@ export function createHallZone(): Zone {
           if (target) ctx.goTo(target);
           else if (id === "key-table") emit("sign-read", { text: keyTableText(useGameStore.getState().keys) });
           else if (id === "garden-door") {
-            emit("game-won", { title: "You unlocked the garden!", lesson: GARDEN_LESSON });
+            if (gardenApproach(useGameStore.getState().keys).isOpen) ctx.goTo(SCENE_GARDEN);
           }
         }),
         on("rabbit-say", (line) => rabbit?.say(line)),
@@ -214,7 +215,7 @@ export function createHallZone(): Zone {
         const isNear = Math.hypot(x, z - GARDEN_Z) <= GARDEN_TRIGGER_METERS;
         if (isNear && !isNearGarden) {
           const result = gardenApproach(useGameStore.getState().keys);
-          if (result.isOpen) emit("game-won", { title: "You unlocked the garden!", lesson: GARDEN_LESSON });
+          if (result.isOpen) enterGarden?.();
           else emit("hint", { text: result.message, tone: "info" });
         }
         isNearGarden = isNear;
@@ -226,6 +227,7 @@ export function createHallZone(): Zone {
       table = null;
       rabbit = null;
       eye = null;
+      enterGarden = null;
       isNearGarden = false;
     },
   };

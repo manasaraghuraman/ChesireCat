@@ -89,7 +89,14 @@ export function App({
     );
   const embeddedLevel = isEmbedded ? requestedLevel() : null;
   if (embeddedLevel && mode === "title")
-    return <EmbedStart level={embeddedLevel} ready={ready} error={error} start={start} />;
+    return (
+      <EmbedStart
+        level={embeddedLevel}
+        ready={ready}
+        error={error}
+        start={start}
+      />
+    );
   const action = run?.actionAt(run.activeRing);
   const completion = run?.latestCompletion;
   const carbon = completion && carbonActions[completion.type];
@@ -190,6 +197,9 @@ export function App({
     return (
       <section class="panel">
         <h2>{course.name} complete</h2>
+        {isEmbedded && (
+          <EmbedChoices level={course.id} hasNext={Boolean(next)} />
+        )}
         <strong class="medal">{medal(course.id, run.finalTime)}</strong>
         <h1>{time(run.finalTime)}</h1>
         <dl>
@@ -291,9 +301,7 @@ export function App({
         {!save.persistent && (
           <p role="status">Progress is available for this session only.</p>
         )}
-        {isEmbedded ? (
-          <EmbedChoices level={course.id} hasNext={Boolean(next)} />
-        ) : (
+        {!isEmbedded && (
           <div class="actions">
             <button onClick={() => start()}>Run again</button>
             {next && (

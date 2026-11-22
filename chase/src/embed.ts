@@ -13,18 +13,32 @@ export interface ChaseMessage {
   readonly source: "carbon-chase";
   readonly choice: ChaseChoice;
   readonly level: LevelId;
+  readonly completed: boolean;
 }
 
-export const isEmbedded = new URLSearchParams(window.location.search).has("embed") && window.parent !== window;
+export const isEmbedded =
+  new URLSearchParams(window.location.search).has("embed") &&
+  window.parent !== window;
 
 /** The level the parent asked for (?level=...), validated against the real course list. */
-export function requestedLevel(search: string = window.location.search): LevelId | null {
+export function requestedLevel(
+  search: string = window.location.search,
+): LevelId | null {
   const id = new URLSearchParams(search).get("level");
   return courses.find((course) => course.id === id)?.id ?? null;
 }
 
 /** Tells the parent page what the player chose. Only the same origin can receive it. */
-export function sendChoice(choice: ChaseChoice, level: LevelId): void {
-  const message: ChaseMessage = { source: "carbon-chase", choice, level };
+export function sendChoice(
+  choice: ChaseChoice,
+  level: LevelId,
+  completed = false,
+): void {
+  const message: ChaseMessage = {
+    source: "carbon-chase",
+    choice,
+    level,
+    completed,
+  };
   window.parent.postMessage(message, window.location.origin);
 }
