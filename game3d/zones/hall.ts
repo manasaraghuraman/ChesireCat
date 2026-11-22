@@ -8,9 +8,10 @@
  */
 import * as THREE from "three";
 import { emit, on } from "../../game/bridge";
-import { KEY_PIECES, SCENE_CHESHIRE, SCENE_HALL } from "../../lib/constants";
+import { GARDEN_KEYS, KEY_PIECES, SCENE_CHESHIRE, SCENE_HALL, SCENE_MAZE, SCENE_CLUES } from "../../lib/constants";
 import type { KeyPieceType } from "../../lib/schemas";
 import { useGameStore } from "../../lib/state/store";
+import { GARDEN_LESSON } from "../../lib/mediaLiteracy";
 import { createDoor, type Door } from "../entities/door";
 import { createKeyTable } from "../entities/keyTable";
 import { createWhiteRabbit, type WhiteRabbit } from "../entities/whiteRabbit";
@@ -21,13 +22,17 @@ import type { Zone, ZoneContext } from "./types";
 /** Same rule as the Phaser hub: only this trial door opens in the demo build. */
 export const DEMO_UNLOCKED_DOOR: KeyPieceType = "cheshire";
 /** Doors that lead somewhere playable in this build. */
-const DOOR_ZONES: Partial<Record<KeyPieceType, string>> = { cheshire: SCENE_CHESHIRE };
+const DOOR_ZONES: Partial<Record<KeyPieceType, string>> = {
+  cheshire: SCENE_CHESHIRE,
+  caterpillar: SCENE_MAZE,
+  hatter: SCENE_CLUES,
+};
 const DOOR_WIDTH = 1.2;
 const DOOR_HEIGHT = 2.4;
 const PIECE_NAMES: Record<KeyPieceType, string> = {
-  caterpillar: "Caterpillar",
+  caterpillar: "News Maze",
   cheshire: "Cheshire Cat",
-  hatter: "Mad Hatter",
+  hatter: "Clue Room",
   queen: "Queen of Hearts",
 };
 
@@ -39,23 +44,39 @@ export function hallInteractables(
   base: readonly LevelInteractable[],
   keys: readonly KeyPieceType[],
 ): LevelInteractable[] {
+  const hasAllKeys = GARDEN_KEYS.every((piece) => keys.includes(piece));
   return base.map((item) => {
+    if (item.id === "garden-door") {
+      return { ...item, enabled: hasAllKeys, label: hasAllKeys ? "the garden: unlock it with the Golden Key" : item.label };
+    }
     const piece = KEY_PIECES.find((p) => item.id === doorId(p));
     if (!piece) return item;
     return {
       ...item,
-      enabled: piece === DEMO_UNLOCKED_DOOR && Boolean(DOOR_ZONES[piece]),
+      enabled: Boolean(DOOR_ZONES[piece]),
       label: keys.includes(piece) ? `${item.label} ✓` : item.label,
     };
   });
 }
 
+/** What happens when the player walks up to the tiny garden door. Pure. */
+export function gardenApproach(keys: readonly KeyPieceType[]): { readonly isOpen: boolean; readonly message: string } {
+  const have = GARDEN_KEYS.filter((piece) => keys.includes(piece)).length;
+  return have === GARDEN_KEYS.length
+    ? { isOpen: true, message: "All three key pieces click together into the Golden Key... the garden door opens!" }
+    : { isOpen: false, message: `The tiny garden door needs all ${GARDEN_KEYS.length} key pieces. You have ${have}.` };
+}
+
+/** Walk this close (metres, flat) to the garden door and it reacts: no staring at the floor needed. */
+export const GARDEN_TRIGGER_METERS = 2.4;
+const GARDEN_Z = -30.6;
+
 export function keyTableText(keys: readonly KeyPieceType[]): string {
-  const earned = KEY_PIECES.filter((p) => keys.includes(p)).map((p) => PIECE_NAMES[p]);
-  const count = `${earned.length} of ${KEY_PIECES.length} key pieces`;
+  const earned = GARDEN_KEYS.filter((p) => keys.includes(p)).map((p) => PIECE_NAMES[p]);
+  const count = `${earned.length} of ${GARDEN_KEYS.length} key pieces`;
   return earned.length
-    ? `The Golden Key slot: ${count} (${earned.join(", ")}). The tiny garden door needs the whole key.`
-    : `The Golden Key slot is empty: ${count}. See through a character's trick to earn a piece.`;
+    ? `The Golden Key slot: ${count} (${earned.join(", ")}). The tiny garden door needs all of them.`
+    : `The Golden Key slot is empty: ${count}. Win a room's mini game to earn a piece.`;
 }
 
 function checkerTexture(): THREE.CanvasTexture {
@@ -93,6 +114,8 @@ export function createHallZone(): Zone {
   let table: ReturnType<typeof createKeyTable> | null = null;
   let rabbit: WhiteRabbit | null = null;
   let reduced = false;
+  let eye: ZoneContext["eyePosition"] | null = null;
+  let isNearGarden = false;
 
   return {
     id: SCENE_HALL,
@@ -100,6 +123,8 @@ export function createHallZone(): Zone {
     enter(ctx: ZoneContext) {
       useGameStore.getState().goToLevel("caterpillar"); // as the Phaser hub did
       reduced = ctx.reducedMotion;
+      eye = ctx.eyePosition;
+      isNearGarden = false;
       ctx.scene.background = new THREE.Color(0x1d1428);
       ctx.scene.fog = new THREE.Fog(0x1d1428, 18, 45);
       ctx.root.add(new THREE.HemisphereLight(0xfff0d8, 0x3a2c4a, 1.8));
@@ -156,10 +181,11 @@ export function createHallZone(): Zone {
       const base = ctx.level?.interactables ?? [];
       const refresh = (keys: readonly KeyPieceType[]) => {
         for (const piece of KEY_PIECES) {
-          const isOpen = piece === DEMO_UNLOCKED_DOOR;
+          const isOpen = Boolean(DOOR_ZONES[piece]);
           doors.get(piece)?.setState(keys.includes(piece) ? "earned" : isOpen ? "open" : "locked");
         }
         table?.setEarned(keys);
+        garden.setState(GARDEN_KEYS.every((piece) => keys.includes(piece)) ? "open" : "locked");
         ctx.setInteractables([...hallInteractables(base, keys), rabbitItem]);
       };
       refresh(useGameStore.getState().keys);
@@ -173,6 +199,9 @@ export function createHallZone(): Zone {
           const target = piece && DOOR_ZONES[piece];
           if (target) ctx.goTo(target);
           else if (id === "key-table") emit("sign-read", { text: keyTableText(useGameStore.getState().keys) });
+          else if (id === "garden-door") {
+            emit("game-won", { title: "You unlocked the garden!", lesson: GARDEN_LESSON });
+          }
         }),
         on("rabbit-say", (line) => rabbit?.say(line)),
       );
@@ -180,12 +209,24 @@ export function createHallZone(): Zone {
     update(dt, elapsed) {
       table?.update(elapsed, reduced);
       rabbit?.update(dt, elapsed, reduced);
+      if (eye) {
+        const [x, , z] = eye();
+        const isNear = Math.hypot(x, z - GARDEN_Z) <= GARDEN_TRIGGER_METERS;
+        if (isNear && !isNearGarden) {
+          const result = gardenApproach(useGameStore.getState().keys);
+          if (result.isOpen) emit("game-won", { title: "You unlocked the garden!", lesson: GARDEN_LESSON });
+          else emit("hint", { text: result.message, tone: "info" });
+        }
+        isNearGarden = isNear;
+      }
     },
     exit() {
       offs.splice(0).forEach((off) => off());
       emit("sign-read", null);
       table = null;
       rabbit = null;
+      eye = null;
+      isNearGarden = false;
     },
   };
 }

@@ -20,6 +20,8 @@ export const LEVEL_IDS = ["fall", "caterpillar", "cheshire", "hatter", "queen", 
 export const SCENE_FALL = "Fall";
 export const SCENE_HALL = "HallOfDoors";
 export const SCENE_CHESHIRE = "Cheshire";
+export const SCENE_MAZE = "Maze";
+export const SCENE_CLUES = "Clues";
 
 /** Size change ranges the Referee's sizeDelta is clamped to, by outcome (spec §3.1). */
 export const SIZE_DELTA_RESISTED = { min: 5, max: 20 } as const;
@@ -32,3 +34,6 @@ export const NPC_MAX_TEXT = 500;
 /** How many recent turns the NPC and Referee see. */
 export const NPC_CONTEXT_TURNS = 8;
 export const NPC_RATE_LIMIT_PER_MINUTE = 20;
+
+/** The three key pieces that open the garden in this build (Cheshire signposts, News Maze, Clue Room). */
+export const GARDEN_KEYS = ["cheshire", "caterpillar", "hatter"] as const;

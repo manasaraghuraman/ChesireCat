@@ -45,6 +45,10 @@ export interface BridgeEvents {
   readonly "rabbit-replay": string;
   /** A key piece the store awarded outside a verdict (held until the Rabbit was cured) → lesson card. */
   readonly "key-awarded": { readonly piece: string; readonly lesson: string | null };
+  /** Zone → overlay: a short message for the player (instructions, right/wrong feedback). */
+  readonly hint: { readonly text: string; readonly tone: "info" | "good" | "bad" };
+  /** Maze zone → overlay: the player finished the game. */
+  readonly "game-won": { readonly lesson: string; readonly title?: string };
   /** The store just rewound the level → play the rewind effect. */
   readonly rewind: null;
 }

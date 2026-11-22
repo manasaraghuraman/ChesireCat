@@ -1,542 +1,542 @@
 {
-  "id": "cheshire",
-  "name": "The Tulgey Wood",
-  "spawn": {
-    "pos": [
-      0,
-      0,
-      7
-    ],
-    "yaw": 0
+ "id": "cheshire",
+ "name": "The Tulgey Wood",
+ "spawn": {
+  "pos": [
+   0,
+   0,
+   7
+  ],
+  "yaw": 0
+ },
+ "geometry": [
+  {
+   "shape": "box",
+   "pos": [
+    0,
+    -0.5,
+    0
+   ],
+   "size": [
+    30,
+    1,
+    30
+   ],
+   "tags": [
+    "floor"
+   ]
   },
-  "geometry": [
-    {
-      "shape": "box",
-      "pos": [
-        0,
-        -0.5,
-        0
-      ],
-      "size": [
-        30,
-        1,
-        30
-      ],
-      "tags": [
-        "floor"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -13,
-        2,
-        0
-      ],
-      "size": [
-        0.5,
-        4,
-        27
-      ],
-      "tags": [
-        "invisible"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        13,
-        2,
-        0
-      ],
-      "size": [
-        0.5,
-        4,
-        27
-      ],
-      "tags": [
-        "invisible"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        0,
-        2,
-        -13
-      ],
-      "size": [
-        27,
-        4,
-        0.5
-      ],
-      "tags": [
-        "invisible"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        0,
-        2,
-        13
-      ],
-      "size": [
-        27,
-        4,
-        0.5
-      ],
-      "tags": [
-        "invisible"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        11.6,
-        3,
-        0.0
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        10.45,
-        3,
-        5.03
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        7.23,
-        3,
-        9.07
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        2.58,
-        3,
-        11.31
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -2.58,
-        3,
-        11.31
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -7.23,
-        3,
-        9.07
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -10.45,
-        3,
-        5.03
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -11.6,
-        3,
-        0.0
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -10.45,
-        3,
-        -5.03
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -7.23,
-        3,
-        -9.07
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -2.58,
-        3,
-        -11.31
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        2.58,
-        3,
-        -11.31
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        7.23,
-        3,
-        -9.07
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        10.45,
-        3,
-        -5.03
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        0,
-        3,
-        -7.4
-      ],
-      "size": [
-        1.0,
-        6,
-        1.0
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -5,
-        3,
-        -8.4
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        5,
-        3,
-        -6.4
-      ],
-      "size": [
-        0.8,
-        6,
-        0.8
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -7,
-        3,
-        3
-      ],
-      "size": [
-        0.7,
-        6,
-        0.7
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        7.5,
-        3,
-        2
-      ],
-      "size": [
-        0.7,
-        6,
-        0.7
-      ],
-      "tags": [
-        "tree"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -1.4,
-        0.6,
-        1.5
-      ],
-      "size": [
-        0.15,
-        1.2,
-        0.15
-      ],
-      "tags": [
-        "invisible"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        1.4,
-        0.6,
-        1.5
-      ],
-      "size": [
-        0.15,
-        1.2,
-        0.15
-      ],
-      "tags": [
-        "invisible"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        -0.8,
-        1.25,
-        10.6
-      ],
-      "size": [
-        0.15,
-        2.5,
-        0.15
-      ],
-      "tags": [
-        "invisible"
-      ]
-    },
-    {
-      "shape": "box",
-      "pos": [
-        0.8,
-        1.25,
-        10.6
-      ],
-      "size": [
-        0.15,
-        2.5,
-        0.15
-      ],
-      "tags": [
-        "invisible"
-      ]
-    }
-  ],
-  "interactables": [
-    {
-      "id": "cheshire-cat",
-      "kind": "npc",
-      "pos": [
-        0,
-        3.3,
-        -6.6
-      ],
-      "radius": 0.9,
-      "label": "the Cheshire Cat",
-      "enabled": true
-    },
-    {
-      "id": "sign-real",
-      "kind": "sign",
-      "pos": [
-        -1.4,
-        1.3,
-        1.5
-      ],
-      "radius": 0.5,
-      "label": "the left signpost",
-      "enabled": true
-    },
-    {
-      "id": "sign-fake",
-      "kind": "sign",
-      "pos": [
-        1.4,
-        1.3,
-        1.5
-      ],
-      "radius": 0.5,
-      "label": "the right signpost",
-      "enabled": true
-    },
-    {
-      "id": "exit-hall",
-      "kind": "door",
-      "pos": [
-        0,
-        1.3,
-        10.3
-      ],
-      "radius": 0.8,
-      "label": "the way back to the Hall of Doors",
-      "enabled": true
-    }
-  ],
-  "npcs": [
-    {
-      "id": "cheshire-cat",
-      "pos": [
-        0,
-        3.3,
-        -6.6
-      ],
-      "branchPositions": [
-        [
-          -4.5,
-          3.1,
-          -7.6
-        ],
-        [
-          4.5,
-          3.5,
-          -5.6
-        ]
-      ]
-    },
-    {
-      "id": "white-rabbit",
-      "pos": [
-        -2.5,
-        0,
-        9
-      ]
-    }
-  ]
+  {
+   "shape": "box",
+   "pos": [
+    -13,
+    2,
+    0
+   ],
+   "size": [
+    0.5,
+    4,
+    27
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    13,
+    2,
+    0
+   ],
+   "size": [
+    0.5,
+    4,
+    27
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    0,
+    2,
+    -13
+   ],
+   "size": [
+    27,
+    4,
+    0.5
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    0,
+    2,
+    13
+   ],
+   "size": [
+    27,
+    4,
+    0.5
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    11.6,
+    3,
+    0.0
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    10.45,
+    3,
+    5.03
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    7.23,
+    3,
+    9.07
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    2.58,
+    3,
+    11.31
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -2.58,
+    3,
+    11.31
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -7.23,
+    3,
+    9.07
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -10.45,
+    3,
+    5.03
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -11.6,
+    3,
+    0.0
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -10.45,
+    3,
+    -5.03
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -7.23,
+    3,
+    -9.07
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -2.58,
+    3,
+    -11.31
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    2.58,
+    3,
+    -11.31
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    7.23,
+    3,
+    -9.07
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    10.45,
+    3,
+    -5.03
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    0,
+    3,
+    -7.4
+   ],
+   "size": [
+    1.0,
+    6,
+    1.0
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -5,
+    3,
+    -8.4
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    5,
+    3,
+    -6.4
+   ],
+   "size": [
+    0.8,
+    6,
+    0.8
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -7,
+    3,
+    3
+   ],
+   "size": [
+    0.7,
+    6,
+    0.7
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    7.5,
+    3,
+    2
+   ],
+   "size": [
+    0.7,
+    6,
+    0.7
+   ],
+   "tags": [
+    "tree"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -1.4,
+    0.6,
+    1.5
+   ],
+   "size": [
+    0.15,
+    1.2,
+    0.15
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    1.4,
+    0.6,
+    1.5
+   ],
+   "size": [
+    0.15,
+    1.2,
+    0.15
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -0.8,
+    1.25,
+    10.6
+   ],
+   "size": [
+    0.15,
+    2.5,
+    0.15
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    0.8,
+    1.25,
+    10.6
+   ],
+   "size": [
+    0.15,
+    2.5,
+    0.15
+   ],
+   "tags": [
+    "invisible"
+   ]
+  }
+ ],
+ "interactables": [
+  {
+   "id": "cheshire-cat",
+   "kind": "npc",
+   "pos": [
+    0,
+    3.3,
+    -6.6
+   ],
+   "radius": 0.9,
+   "label": "the Cheshire Cat",
+   "enabled": true
+  },
+  {
+   "id": "sign-real",
+   "kind": "sign",
+   "pos": [
+    -1.4,
+    1.3,
+    1.5
+   ],
+   "radius": 0.5,
+   "label": "the left signpost",
+   "enabled": true
+  },
+  {
+   "id": "sign-fake",
+   "kind": "sign",
+   "pos": [
+    1.4,
+    1.3,
+    1.5
+   ],
+   "radius": 0.5,
+   "label": "the right signpost",
+   "enabled": true
+  },
+  {
+   "id": "exit-hall",
+   "kind": "door",
+   "pos": [
+    0,
+    1.3,
+    10.3
+   ],
+   "radius": 0.8,
+   "label": "the way back to the Hall of Doors",
+   "enabled": true
+  }
+ ],
+ "npcs": [
+  {
+   "id": "cheshire-cat",
+   "pos": [
+    0,
+    3.3,
+    -6.6
+   ],
+   "branchPositions": [
+    [
+     -4.5,
+     3.1,
+     -7.6
+    ],
+    [
+     4.5,
+     3.5,
+     -5.6
+    ]
+   ]
+  },
+  {
+   "id": "white-rabbit",
+   "pos": [
+    -2.5,
+    0,
+    9
+   ]
+  }
+ ]
 }

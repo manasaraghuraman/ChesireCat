@@ -9,7 +9,7 @@
 
 import { emit } from "@/game/bridge";
 import { SETTINGS_LIMITS } from "@/game3d/settings";
-import { SCENE_CHESHIRE, SCENE_FALL } from "@/lib/constants";
+import { SCENE_CHESHIRE, SCENE_FALL, SCENE_MAZE, SCENE_CLUES } from "@/lib/constants";
 import { useSettings } from "./useSettings";
 import { useWorldUi } from "./useWorldUi";
 
@@ -84,7 +84,7 @@ export default function PauseMenu({ title = "Down the Rabbit Hole" }: PauseMenuP
 
   // emit() is synchronous, so the world requests pointer lock inside this click (a user gesture).
   const resume = () => emit("capture-request", null);
-  const backToHall = scene === SCENE_CHESHIRE ? () => emit("exit-level", null) : null;
+  const backToHall = scene === SCENE_CHESHIRE || scene === SCENE_MAZE || scene === SCENE_CLUES ? () => emit("exit-level", null) : null;
 
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40 p-4 font-sans">

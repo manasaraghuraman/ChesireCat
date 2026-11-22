@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { parseLevel } from "./level";
 import { cleanSettings, DEFAULT_SETTINGS, loadSettings, saveSettings, SETTINGS_KEY } from "./settings";
 import { KEY_HEIGHT } from "./sizing";
-import { DEMO_UNLOCKED_DOOR, hallInteractables, keyTableText } from "./zones/hall";
+import { DEMO_UNLOCKED_DOOR, gardenApproach, hallInteractables, keyTableText } from "./zones/hall";
 
 function level(id: string) {
   return parseLevel(JSON.parse(readFileSync(join(process.cwd(), `public/levels/${id}.level.json`), "utf8")));
@@ -19,11 +19,34 @@ function level(id: string) {
 describe("hall", () => {
   const base = level("hall").interactables;
 
-  it("enables only the demo door and keeps the garden locked", () => {
+  it("opens exactly the Cheshire, News Maze and Clue Room doors and keeps the garden locked", () => {
     const items = hallInteractables(base, []);
     const enabled = items.filter((i) => i.kind === "door" && i.enabled).map((i) => i.id);
-    expect(enabled).toEqual([`door-${DEMO_UNLOCKED_DOOR}`]);
+    expect(enabled.sort()).toEqual([`door-caterpillar`, `door-hatter`, `door-${DEMO_UNLOCKED_DOOR}`].sort());
     expect(items.find((i) => i.id === "garden-door")?.enabled).toBe(false);
+  });
+
+  it("unlocks the garden door only with all three garden keys", () => {
+    const garden = (keys: Parameters<typeof hallInteractables>[1]) =>
+      hallInteractables(base, keys).find((i) => i.id === "garden-door")?.enabled;
+    expect(garden([])).toBe(false);
+    expect(garden(["cheshire", "caterpillar"])).toBe(false);
+    expect(garden(["cheshire", "caterpillar", "hatter"])).toBe(true);
+    expect(garden(["cheshire", "caterpillar", "queen"])).toBe(false);
+  });
+
+  it("garden approach opens only with all three keys and says how many you have otherwise", () => {
+    expect(gardenApproach(["cheshire", "caterpillar", "hatter"]).isOpen).toBe(true);
+    const two = gardenApproach(["cheshire", "hatter"]);
+    expect(two.isOpen).toBe(false);
+    expect(two.message).toMatch(/You have 2/);
+    expect(gardenApproach([]).message).toMatch(/You have 0/);
+  });
+
+  it("makes the garden door easy to trigger: not a floor-level, tiny-radius target", () => {
+    const garden = base.find((i) => i.id === "garden-door");
+    expect(garden?.pos[1]).toBeGreaterThanOrEqual(0.9);
+    expect(garden?.radius).toBeGreaterThanOrEqual(1.2);
   });
 
   it("marks earned doors with a tick", () => {
@@ -38,12 +61,12 @@ describe("hall", () => {
 
   it("describes the key slot from the store's keys", () => {
     expect(keyTableText([])).toMatch(/empty/);
-    expect(keyTableText(["cheshire"])).toMatch(/1 of 4.*Cheshire Cat/);
+    expect(keyTableText(["cheshire"])).toMatch(/1 of 3.*Cheshire Cat/);
   });
 });
 
 describe("shipped levels", () => {
-  it.each(["hall", "cheshire"])("%s parses", (id) => {
+  it.each(["hall", "cheshire", "maze", "clues"])("%s parses", (id) => {
     expect(level(id).id).toBe(id);
   });
 });

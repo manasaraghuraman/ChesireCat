@@ -62,8 +62,8 @@ describe("parseLevel", () => {
     expect(() => parseLevel(raw)).toThrow();
   });
 
-  it("accepts the shipped Hall of Doors", () => {
-    const raw: unknown = JSON.parse(readFileSync(join(process.cwd(), "public/levels/hall.level.json"), "utf8"));
-    expect(parseLevel(raw).id).toBe("hall");
+  it("accepts the shipped maze", () => {
+    const raw: unknown = JSON.parse(readFileSync(join(process.cwd(), "public/levels/maze.level.json"), "utf8"));
+    expect(parseLevel(raw).id).toBe("maze");
   });
 });

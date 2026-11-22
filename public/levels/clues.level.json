@@ -1,0 +1,181 @@
+{
+ "id": "clues",
+ "name": "The Clue Room",
+ "spawn": {
+  "pos": [
+   0,
+   0,
+   7
+  ],
+  "yaw": 0
+ },
+ "geometry": [
+  {
+   "shape": "box",
+   "pos": [
+    0,
+    -0.5,
+    0
+   ],
+   "size": [
+    30,
+    1,
+    30
+   ],
+   "tags": [
+    "floor"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    -13,
+    2,
+    0
+   ],
+   "size": [
+    0.5,
+    4,
+    27
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    13,
+    2,
+    0
+   ],
+   "size": [
+    0.5,
+    4,
+    27
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    0,
+    2,
+    -13
+   ],
+   "size": [
+    27,
+    4,
+    0.5
+   ],
+   "tags": [
+    "invisible"
+   ]
+  },
+  {
+   "shape": "box",
+   "pos": [
+    0,
+    2,
+    13
+   ],
+   "size": [
+    27,
+    4,
+    0.5
+   ],
+   "tags": [
+    "invisible"
+   ]
+  }
+ ],
+ "interactables": [
+  {
+   "id": "clue-1",
+   "kind": "sign",
+   "pos": [
+    -7.5,
+    2.1,
+    0
+   ],
+   "radius": 1.5,
+   "label": "a clue",
+   "enabled": true
+  },
+  {
+   "id": "clue-2",
+   "kind": "sign",
+   "pos": [
+    -2.5,
+    2.1,
+    0
+   ],
+   "radius": 1.5,
+   "label": "a clue",
+   "enabled": true
+  },
+  {
+   "id": "clue-3",
+   "kind": "sign",
+   "pos": [
+    2.5,
+    2.1,
+    0
+   ],
+   "radius": 1.5,
+   "label": "a clue",
+   "enabled": true
+  },
+  {
+   "id": "clue-4",
+   "kind": "sign",
+   "pos": [
+    7.5,
+    2.1,
+    0
+   ],
+   "radius": 1.5,
+   "label": "a clue",
+   "enabled": true
+  },
+  {
+   "id": "verdict-real",
+   "kind": "sign",
+   "pos": [
+    -4,
+    2.1,
+    -9
+   ],
+   "radius": 1.5,
+   "label": "verdict: REAL",
+   "enabled": true
+  },
+  {
+   "id": "verdict-fake",
+   "kind": "sign",
+   "pos": [
+    4,
+    2.1,
+    -9
+   ],
+   "radius": 1.5,
+   "label": "verdict: FAKE",
+   "enabled": true
+  },
+  {
+   "id": "exit-hall",
+   "kind": "door",
+   "pos": [
+    0,
+    1.3,
+    10.3
+   ],
+   "radius": 0.8,
+   "label": "the way back to the Hall of Doors",
+   "enabled": true
+  }
+ ],
+ "npcs": []
+}

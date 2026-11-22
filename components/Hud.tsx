@@ -9,16 +9,16 @@
 
 import { useEffect, useState } from "react";
 import { on } from "@/game/bridge";
-import { KEY_PIECES, SCENE_CHESHIRE, SCENE_FALL, SCENE_HALL, SIZE_MAX, SIZE_TOO_SMALL } from "@/lib/constants";
+import { GARDEN_KEYS, KEY_PIECES, SCENE_CHESHIRE, SCENE_FALL, SCENE_HALL, SCENE_MAZE, SCENE_CLUES } from "@/lib/constants";
 import type { KeyPieceType } from "@/lib/schemas";
 import { useGameStore } from "@/lib/state/store";
 import InteractPrompt from "./InteractPrompt";
 import { useWorldUi } from "./useWorldUi";
 
 const PIECE_NAMES: Record<(typeof KEY_PIECES)[number], string> = {
-  caterpillar: "Caterpillar",
+  caterpillar: "News Maze",
   cheshire: "Cheshire Cat",
-  hatter: "Mad Hatter",
+  hatter: "Clue Room",
   queen: "Queen of Hearts",
 };
 
@@ -28,8 +28,13 @@ const SIGN_SECONDS = 8;
 /** One line telling the player what to do next, from the scene and progress (spec §2.7). */
 export function objectiveFor(scene: string | null, keys: readonly KeyPieceType[]): string | null {
   const hasCheshire = keys.includes("cheshire");
-  if (scene === SCENE_HALL) return hasCheshire ? "Open the garden door" : "Find the Cheshire Cat's door";
-  if (scene === SCENE_CHESHIRE) return hasCheshire ? "Return to the Hall" : "Find the Cheshire Cat in the Tulgey Wood";
+  const earned = GARDEN_KEYS.filter((piece) => keys.includes(piece)).length;
+  if (scene === SCENE_HALL) {
+    return earned === GARDEN_KEYS.length ? "You have all 3 keys: open the tiny garden door!" : `Win each open door's mini game for a key (${earned}/${GARDEN_KEYS.length})`;
+  }
+  if (scene === SCENE_CHESHIRE) return hasCheshire ? "Return to the Hall (press H)" : "Press E on the Cat, then read the signposts and pick the honest shop";
+  if (scene === SCENE_MAZE) return "Walk up to the news boards: collect 3 trustworthy sources, then reach the exit";
+  if (scene === SCENE_CLUES) return "Inspect all 4 clues, then walk up to your verdict: REAL or FAKE";
   return null;
 }
 
@@ -59,38 +64,6 @@ function SignText() {
   );
 }
 
-function SizeMeter({ size }: { readonly size: number }) {
-  const percent = (size / SIZE_MAX) * 100;
-  const tooSmallPercent = (SIZE_TOO_SMALL / SIZE_MAX) * 100;
-  const isTooSmall = size < SIZE_TOO_SMALL;
-  return (
-    <div className="flex items-end gap-3">
-      <div
-        role="meter"
-        aria-label="Size"
-        aria-valuemin={0}
-        aria-valuemax={SIZE_MAX}
-        aria-valuenow={size}
-        className="relative h-36 w-7 overflow-hidden rounded-b-xl rounded-t-md border-2 border-amber-200/70 bg-black/40"
-      >
-        <div
-          className={`absolute inset-x-0 bottom-0 transition-[height] duration-500 motion-reduce:transition-none ${
-            isTooSmall ? "bg-rose-400" : "bg-gradient-to-t from-amber-500 to-amber-300"
-          }`}
-          style={{ height: `${percent}%` }}
-        />
-        <div className="absolute inset-x-0 border-t-2 border-dashed border-white/80" style={{ bottom: `${tooSmallPercent}%` }} />
-      </div>
-      <div className="pb-1 text-xs leading-tight">
-        <p className="text-base font-bold">
-          Size <span aria-live="polite">{size}</span>
-        </p>
-        <p className="text-white/70">- - - {SIZE_TOO_SMALL}: too small for the key</p>
-      </div>
-    </div>
-  );
-}
-
 interface HudProps {
   readonly objective?: string;
   /** Hide everything (e.g. during the Fall animation). */
@@ -98,7 +71,6 @@ interface HudProps {
 }
 
 export default function Hud({ objective, hidden = false }: HudProps) {
-  const size = useGameStore((s) => s.size);
   const keys = useGameStore((s) => s.keys);
   const rewinds = useGameStore((s) => s.rewindsLeft[s.currentLevel] ?? 0);
   const { locked, focus, awaitingClick, scene } = useWorldUi();
@@ -109,9 +81,8 @@ export default function Hud({ objective, hidden = false }: HudProps) {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-10 select-none font-sans">
-      {/* Top-left: size, rewinds, objective */}
+      {/* Top-left: rewinds, objective */}
       <div className={`absolute left-4 top-4 flex flex-col gap-2 p-3 ${PANEL}`}>
-        <SizeMeter size={size} />
         <p className="text-sm" aria-label={`${rewinds} rewinds left`}>
           <span aria-hidden>⏱</span> × {rewinds}
         </p>
@@ -121,7 +92,7 @@ export default function Hud({ objective, hidden = false }: HudProps) {
       {/* Top-centre: key pieces */}
       <div className={`absolute left-1/2 top-4 -translate-x-1/2 px-3 py-2 ${PANEL}`}>
         <ul aria-live="polite" aria-label="Key pieces" className="flex gap-2">
-          {KEY_PIECES.map((piece) => {
+          {GARDEN_KEYS.map((piece) => {
             const earned = keys.includes(piece);
             return (
               <li
