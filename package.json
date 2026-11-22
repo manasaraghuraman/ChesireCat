@@ -11,13 +11,14 @@
   },
   "dependencies": {
     "@ai-sdk/groq": "4.0.77",
+    "@dimforge/rapier3d-compat": "0.21.0",
     "@solarisdk/browser": "0.5.5",
     "@solarisdk/sandbox": "0.4.15",
     "ai": "7.0.164",
     "next": "16.4.6",
-    "phaser": "3.90.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "three": "0.180.0",
     "zod": "4.6.7",
     "zustand": "5.1.0"
   },
@@ -26,6 +27,7 @@
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@types/three": "0.180.0",
     "postcss": "8.5.33",
     "tailwindcss": "4.3.5",
     "typescript": "5.9.3",

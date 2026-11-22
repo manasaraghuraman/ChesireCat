@@ -11,3 +11,13 @@ body {
   color: #f5ecd7;
   font-family: Georgia, "Times New Roman", serif;
 }
+
+/* Rewind effect: the clock hand sweeps backwards (components/RewindEffect.tsx). */
+@keyframes rewind-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-720deg);
+  }
+}

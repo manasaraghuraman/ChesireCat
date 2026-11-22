@@ -23,6 +23,25 @@ export interface VerdictOutcome {
   readonly keyAwarded: boolean;
   /** The key was earned but Alice is too small to reach it (spec §3.1). */
   readonly tooSmallForKey: boolean;
+  /** The key was earned, but the Cheshire level also needs the White Rabbit cured (Appendix A §7.2). */
+  readonly heldForRabbit: boolean;
+}
+
+/** What happened when the Rabbit was cured. */
+export interface CureOutcome {
+  readonly keyAwarded: boolean;
+  readonly piece: KeyPieceType | null;
+  readonly lesson: string | null;
+}
+
+/** The level whose key piece also requires curing the White Rabbit ("…AND cures the Rabbit"). */
+export const RABBIT_GATED_PIECE: KeyPieceType = "cheshire";
+
+/** Session-only state (not persisted): a key earned before the cure, and the last rewind point. */
+interface Transient {
+  readonly heldKey: { readonly piece: KeyPieceType; readonly lesson: string | null } | null;
+  /** Size before the last consequential choice, for "the Hatter's stopped clock". */
+  readonly rewindPoint: number | null;
 }
 
 interface Actions {
@@ -32,10 +51,16 @@ interface Actions {
   readonly goToLevel: (level: LevelIdType) => void;
   readonly addLesson: (lesson: string) => void;
   readonly applyVerdict: (piece: KeyPieceType, verdict: RefereeVerdictType) => VerdictOutcome;
+  /** Marks the Rabbit cured and awards a key held for it, if Alice can still reach the key. */
+  readonly cureRabbit: () => CureOutcome;
+  /** Spends a rewind to restore the size from before the last choice. False if none left or nothing to undo. */
+  readonly rewind: (level: LevelIdType) => boolean;
   readonly reset: () => void;
 }
 
-export type GameStore = GameStateType & Actions;
+export type GameStore = GameStateType & Transient & Actions;
+
+const initialTransient = (): Transient => ({ heldKey: null, rewindPoint: null });
 
 const clampSize = (value: number): number => Math.min(SIZE_MAX, Math.max(SIZE_MIN, value));
 
@@ -52,6 +77,7 @@ export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       ...createInitialState(),
+      ...initialTransient(),
       changeSize: (delta) => set((s) => ({ size: clampSize(s.size + delta) })),
       awardKey: (piece) =>
         set((s) => (s.keys.includes(piece) ? s : { keys: [...s.keys, piece] })),
@@ -64,18 +90,41 @@ export const useGameStore = create<GameStore>()(
       goToLevel: (level) => set({ currentLevel: level }),
       addLesson: (lesson) => set((s) => ({ lessons: [...s.lessons, lesson] })),
       applyVerdict: (piece, verdict) => {
-        const { size: sizeBefore, keys, lessons } = get();
+        const { size: sizeBefore, keys, lessons, rabbitCured } = get();
         const sizeAfter = clampSize(sizeBefore + verdict.sizeDelta);
         const canReachKey = sizeAfter >= SIZE_TOO_SMALL;
-        const keyAwarded = verdict.keyEarned && canReachKey && !keys.includes(piece);
+        const isEarned = verdict.keyEarned && canReachKey && !keys.includes(piece);
+        const heldForRabbit = isEarned && piece === RABBIT_GATED_PIECE && !rabbitCured;
+        const keyAwarded = isEarned && !heldForRabbit;
         set({
           size: sizeAfter,
+          rewindPoint: sizeAfter !== sizeBefore ? sizeBefore : get().rewindPoint,
           ...(keyAwarded ? { keys: [...keys, piece] } : {}),
           ...(keyAwarded && verdict.lesson ? { lessons: [...lessons, verdict.lesson] } : {}),
+          ...(heldForRabbit ? { heldKey: { piece, lesson: verdict.lesson } } : {}),
         });
-        return { sizeBefore, sizeAfter, keyAwarded, tooSmallForKey: verdict.keyEarned && !canReachKey };
+        return { sizeBefore, sizeAfter, keyAwarded, tooSmallForKey: verdict.keyEarned && !canReachKey, heldForRabbit };
       },
-      reset: () => set(createInitialState()),
+      cureRabbit: () => {
+        const { heldKey, keys, lessons, size } = get();
+        const canAward = heldKey !== null && size >= SIZE_TOO_SMALL && !keys.includes(heldKey.piece);
+        set({
+          rabbitCured: true,
+          heldKey: canAward ? null : heldKey,
+          ...(canAward && heldKey ? { keys: [...keys, heldKey.piece] } : {}),
+          ...(canAward && heldKey?.lesson ? { lessons: [...lessons, heldKey.lesson] } : {}),
+        });
+        return canAward && heldKey
+          ? { keyAwarded: true, piece: heldKey.piece, lesson: heldKey.lesson }
+          : { keyAwarded: false, piece: null, lesson: null };
+      },
+      rewind: (level) => {
+        const point = get().rewindPoint;
+        if (point === null || !get().useRewind(level)) return false;
+        set({ size: point, rewindPoint: null });
+        return true;
+      },
+      reset: () => set({ ...createInitialState(), ...initialTransient() }),
     }),
     {
       name: STORAGE_KEY,

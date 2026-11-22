@@ -1,21 +1,33 @@
 /**
  * File: app/play/page.tsx
- * Purpose: Mounts the Phaser game canvas, the React HUD, and level overlays.
+ * Purpose: The game: a full-viewport three.js first-person world with the HUD, the Fall pop-up,
+ *          level overlays, the browser panel and the pause menu layered over it.
  * Author: manasa
  * Date: 2026-11-21
  */
-import GameCanvas from "@/components/GameCanvas";
+import BrowserPanel from "@/components/BrowserPanel";
+import FallPopup from "@/components/FallPopup";
 import Hud from "@/components/Hud";
 import LevelOverlay from "@/components/LevelOverlay";
+import PauseMenu from "@/components/PauseMenu";
+import RabbitBubble from "@/components/RabbitBubble";
+import RewindEffect from "@/components/RewindEffect";
+import DevPanel from "@/components/DevPanel";
+import WorldCanvas from "@/components/WorldCanvas";
+import { SCENE_FALL } from "@/lib/constants";
 
 export default function PlayPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center gap-4 p-4">
-      <div className="relative">
-        <GameCanvas />
-        <Hud />
-      </div>
+    <main>
+      <WorldCanvas startZone={SCENE_FALL} />
+      <Hud />
+      <BrowserPanel />
       <LevelOverlay />
+      <RabbitBubble />
+      <FallPopup />
+      <PauseMenu />
+      <RewindEffect />
+      <DevPanel />
     </main>
   );
 }

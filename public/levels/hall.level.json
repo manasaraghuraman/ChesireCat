@@ -1,0 +1,306 @@
+{
+  "id": "hall",
+  "name": "Hall of Doors",
+  "spawn": {
+    "pos": [
+      0,
+      0,
+      0
+    ],
+    "yaw": 0
+  },
+  "geometry": [
+    {
+      "shape": "box",
+      "pos": [
+        0,
+        -0.5,
+        -14
+      ],
+      "size": [
+        10,
+        1,
+        34
+      ],
+      "tags": [
+        "floor"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        -5.25,
+        2.5,
+        -14
+      ],
+      "size": [
+        0.5,
+        5,
+        34
+      ],
+      "tags": [
+        "wall"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        5.25,
+        2.5,
+        -14
+      ],
+      "size": [
+        0.5,
+        5,
+        34
+      ],
+      "tags": [
+        "wall"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        0,
+        2.5,
+        3.25
+      ],
+      "size": [
+        11,
+        5,
+        0.5
+      ],
+      "tags": [
+        "wall"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        0,
+        2.5,
+        -31.25
+      ],
+      "size": [
+        11,
+        5,
+        0.5
+      ],
+      "tags": [
+        "wall"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        0,
+        5.25,
+        -14
+      ],
+      "size": [
+        11,
+        0.5,
+        34
+      ],
+      "tags": [
+        "ceiling"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        0,
+        0.4,
+        -14
+      ],
+      "size": [
+        1.6,
+        0.8,
+        1.0
+      ],
+      "tags": [
+        "invisible"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        -4.85,
+        2.4,
+        -2
+      ],
+      "size": [
+        0.3,
+        4.8,
+        1.2
+      ],
+      "tags": [
+        "curtain"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        4.85,
+        2.4,
+        -2
+      ],
+      "size": [
+        0.3,
+        4.8,
+        1.2
+      ],
+      "tags": [
+        "curtain"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        -4.85,
+        2.4,
+        -14
+      ],
+      "size": [
+        0.3,
+        4.8,
+        1.2
+      ],
+      "tags": [
+        "curtain"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        4.85,
+        2.4,
+        -14
+      ],
+      "size": [
+        0.3,
+        4.8,
+        1.2
+      ],
+      "tags": [
+        "curtain"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        -4.85,
+        2.4,
+        -26
+      ],
+      "size": [
+        0.3,
+        4.8,
+        1.2
+      ],
+      "tags": [
+        "curtain"
+      ]
+    },
+    {
+      "shape": "box",
+      "pos": [
+        4.85,
+        2.4,
+        -26
+      ],
+      "size": [
+        0.3,
+        4.8,
+        1.2
+      ],
+      "tags": [
+        "curtain"
+      ]
+    }
+  ],
+  "interactables": [
+    {
+      "id": "door-caterpillar",
+      "kind": "door",
+      "pos": [
+        -4.4,
+        1.3,
+        -8
+      ],
+      "radius": 0.8,
+      "label": "the Caterpillar's door",
+      "enabled": false
+    },
+    {
+      "id": "door-cheshire",
+      "kind": "door",
+      "pos": [
+        -4.4,
+        1.3,
+        -20
+      ],
+      "radius": 0.8,
+      "label": "the Cheshire Cat's door",
+      "enabled": true
+    },
+    {
+      "id": "door-hatter",
+      "kind": "door",
+      "pos": [
+        4.4,
+        1.3,
+        -8
+      ],
+      "radius": 0.8,
+      "label": "the Mad Hatter's door",
+      "enabled": false
+    },
+    {
+      "id": "door-queen",
+      "kind": "door",
+      "pos": [
+        4.4,
+        1.3,
+        -20
+      ],
+      "radius": 0.8,
+      "label": "the Queen of Hearts' door",
+      "enabled": false
+    },
+    {
+      "id": "garden-door",
+      "kind": "door",
+      "pos": [
+        0,
+        0.45,
+        -30.6
+      ],
+      "radius": 0.5,
+      "label": "the garden \u2014 needs the Golden Key",
+      "enabled": false
+    },
+    {
+      "id": "key-table",
+      "kind": "key",
+      "pos": [
+        0,
+        0.875,
+        -14
+      ],
+      "radius": 0.5,
+      "label": "the Golden Key slot",
+      "enabled": true
+    }
+  ],
+  "npcs": [
+    {
+      "id": "white-rabbit",
+      "pos": [
+        1.6,
+        0,
+        -3
+      ]
+    }
+  ]
+}

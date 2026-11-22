@@ -65,23 +65,32 @@ async function replayUrlFor(client: Solari, sessionId: string): Promise<string |
   }
 }
 
+async function visit(session: BrowserSession, url: URL): Promise<PageCapture> {
+  const page = await session.newPage();
+  await page.goto(url.toString(), { timeout: NAVIGATION_TIMEOUT_MS, waitUntil: "load" });
+  const screenshot = await page.screenshot({ type: "png" });
+  const text = await page.evaluate(() => document.body?.innerText ?? "");
+  const hasPasswordField = (await page.locator("input[type=password]").count()) > 0;
+  return {
+    finalUrl: page.url(),
+    title: await page.title(),
+    text: text.slice(0, MAX_PAGE_TEXT_CHARS),
+    screenshotPngBase64: screenshot.toString("base64"),
+    hasPasswordField,
+  };
+}
+
 /** Visits a validated URL inside Solari and captures what an ordinary visitor sees. */
 export async function capturePage(rawUrl: string): Promise<Result<PageCapture>> {
   const target = validateTargetUrl(rawUrl);
   if (!target.isOk) return target;
-  const result = await withBrowser(async ({ session }) => {
-    const page = await session.newPage();
-    await page.goto(target.value.toString(), { timeout: NAVIGATION_TIMEOUT_MS, waitUntil: "load" });
-    const screenshot = await page.screenshot({ type: "png" });
-    const text = await page.evaluate(() => document.body?.innerText ?? "");
-    const hasPasswordField = (await page.locator("input[type=password]").count()) > 0;
-    return {
-      finalUrl: page.url(),
-      title: await page.title(),
-      text: text.slice(0, MAX_PAGE_TEXT_CHARS),
-      screenshotPngBase64: screenshot.toString("base64"),
-      hasPasswordField,
-    };
-  });
+  const result = await withBrowser(({ session }) => visit(session, target.value));
   return result.isOk ? ok(result.value.value) : result;
+}
+
+/** Same as capturePage, with session recording on; also returns the replay URL (may be null). */
+export async function captureRecordedPage(rawUrl: string): Promise<Result<ScopedOutput<PageCapture>>> {
+  const target = validateTargetUrl(rawUrl);
+  if (!target.isOk) return target;
+  return withBrowser(({ session }) => visit(session, target.value), true);
 }

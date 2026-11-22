@@ -13,9 +13,11 @@ interface Props {
   readonly lesson: string;
   readonly onContinue: () => void;
   readonly onStay: () => void;
+  /** Solari replay of the moment the White Rabbit was fooled (Cheshire level). */
+  readonly replayUrl?: string | null;
 }
 
-export default function LessonCard({ piece, lesson, onContinue, onStay }: Props) {
+export default function LessonCard({ piece, lesson, onContinue, onStay, replayUrl }: Props) {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -42,6 +44,13 @@ export default function LessonCard({ piece, lesson, onContinue, onStay }: Props)
           You earned the {piece} key piece!
         </h2>
         <p className="mt-4 text-lg">{lesson}</p>
+        {replayUrl && (
+          <p className="mt-3 text-sm">
+            <a href={replayUrl} target="_blank" rel="noopener noreferrer" className="text-amber-300 underline">
+              Watch the replay of the moment the White Rabbit was fooled ↗
+            </a>
+          </p>
+        )}
         <div className="mt-6 flex justify-center gap-3">
           <button
             ref={buttonRef}

@@ -2,6 +2,8 @@
  * File: components/DialogueBox.tsx
  * Purpose: NPC conversation UI: streamed replies, player input, and Referee
  *          feedback. The transcript lives only in component state (never saved).
+ *          3D migration: restyled as a bottom-centre panel; forwards the route's optional
+ *          stage `action` (e.g. open_page) and focuses the input when the dialogue opens.
  * Author: varenya
  * Date: 2026-11-21
  */
@@ -9,6 +11,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { NPC_MAX_TEXT, NPC_MAX_TURNS } from "@/lib/constants";
+import type { NpcAction } from "@/lib/agents/actions";
 import { RefereeVerdict, type DialogueTurnType, type RefereeVerdictType } from "@/lib/schemas";
 import { readSse } from "@/lib/sse";
 
@@ -17,11 +20,15 @@ interface Props {
   readonly npcName: string;
   readonly openingLine: string;
   readonly onVerdict: (verdict: RefereeVerdictType) => void;
+  /** Stage direction from the route (e.g. the Cat pops its page up). */
+  readonly onAction?: (action: NpcAction) => void;
+  /** True while the dialogue is open; focuses the input when it becomes true. */
+  readonly isActive?: boolean;
 }
 
 const NETWORK_ERROR = "The Cat vanished entirely. Check your connection and try again.";
 
-export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }: Props) {
+export default function DialogueBox({ levelId, npcName, openingLine, onVerdict, onAction, isActive = true }: Props) {
   const [turns, setTurns] = useState<DialogueTurnType[]>([{ role: "npc", text: openingLine }]);
   const [draft, setDraft] = useState("");
   const [isBusy, setIsBusy] = useState(false);
@@ -29,8 +36,12 @@ export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }
   const [error, setError] = useState<string | null>(null);
   const logRef = useRef<HTMLOListElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => () => abortRef.current?.abort(), []);
+  useEffect(() => {
+    if (isActive) inputRef.current?.focus();
+  }, [isActive]);
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [turns]);
@@ -69,6 +80,7 @@ export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }
       for await (const { event: name, data } of readSse(response.body)) {
         if (name === "line" && typeof data === "string") appendToReply(data);
         else if (name === "line-end") setIsJudging(true);
+        else if (name === "action" && data && typeof data === "object" && "action" in data) onAction?.(data as NpcAction);
         else if (name === "verdict") {
           const verdict = RefereeVerdict.safeParse(data);
           if (verdict.success) onVerdict(verdict.data);
@@ -87,7 +99,10 @@ export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }
   }
 
   return (
-    <section aria-label={`Conversation with the ${npcName}`} className="flex flex-col gap-3 rounded bg-black/50 p-4">
+    <section
+      aria-label={`Conversation with the ${npcName}`}
+      className="flex flex-col gap-3 rounded-xl border border-white/10 bg-black/70 p-4 font-sans shadow-2xl backdrop-blur-md"
+    >
       <ol
         ref={logRef}
         role="log"
@@ -127,6 +142,7 @@ export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }
           Your reply
         </label>
         <input
+          ref={inputRef}
           id="player-reply"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
