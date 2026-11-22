@@ -14,7 +14,7 @@ import { createGardenZone } from "./zones/garden";
 import { parseLevel } from "./level";
 import { cleanSettings, DEFAULT_SETTINGS, loadSettings, saveSettings, SETTINGS_KEY } from "./settings";
 import { KEY_HEIGHT } from "./sizing";
-import { DEMO_UNLOCKED_DOOR, gardenApproach, hallInteractables, keyTableText } from "./zones/hall";
+import { DEMO_UNLOCKED_DOOR, gardenApproach, HALL_DOOR_PIECES, hallInteractables, keyTableText } from "./zones/hall";
 
 function level(id: string) {
   return parseLevel(JSON.parse(readFileSync(join(process.cwd(), `public/levels/${id}.level.json`), "utf8")));
@@ -51,6 +51,16 @@ describe("hall", () => {
     const garden = base.find((i) => i.id === "garden-door");
     expect(garden?.pos[1]).toBeGreaterThanOrEqual(0.9);
     expect(garden?.radius).toBeGreaterThanOrEqual(1.2);
+  });
+
+  it("has no Queen of Hearts door, and exactly three doors", () => {
+    expect(base.some((i) => i.id === "door-queen")).toBe(false);
+    expect(HALL_DOOR_PIECES).not.toContain("queen");
+    expect(base.filter((i) => i.id.startsWith("door-")).map((i) => i.id).sort()).toEqual(["door-caterpillar", "door-cheshire", "door-hatter"]);
+  });
+
+  it("still places the White Rabbit in the Hall", () => {
+    expect(level("hall").npcs.some((n) => n.id === "white-rabbit")).toBe(true);
   });
 
   it("marks earned doors with a tick", () => {

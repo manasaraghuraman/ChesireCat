@@ -12,6 +12,7 @@ import Hud from "@/components/Hud";
 import LevelOverlay from "@/components/LevelOverlay";
 import PauseMenu from "@/components/PauseMenu";
 import RabbitBubble from "@/components/RabbitBubble";
+import RabbitChat from "@/components/RabbitChat";
 import RewindEffect from "@/components/RewindEffect";
 import DevPanel from "@/components/DevPanel";
 import WorldCanvas from "@/components/WorldCanvas";
@@ -25,6 +26,7 @@ export default function PlayPage() {
       <BrowserPanel />
       <LevelOverlay />
       <RabbitBubble />
+      <RabbitChat />
       <FallPopup />
       <PauseMenu />
       <RewindEffect />

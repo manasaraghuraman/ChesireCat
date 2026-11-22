@@ -257,18 +257,6 @@
    "enabled": true
   },
   {
-   "id": "door-queen",
-   "kind": "door",
-   "pos": [
-    4.4,
-    1.3,
-    -20
-   ],
-   "radius": 0.8,
-   "label": "the Queen of Hearts' door",
-   "enabled": false
-  },
-  {
    "id": "garden-door",
    "kind": "door",
    "pos": [

@@ -19,6 +19,9 @@ import {
   MAZE_EXIT_ID,
   PEOPLE,
   personLine,
+  RABBIT_FACTS,
+  rabbitGuidance,
+  rabbitLine,
   RED_FLAG_COUNT,
   REAL_BOARD_IDS,
 } from "./carbonContent";
@@ -167,5 +170,30 @@ describe("people in the maze", () => {
     for (const person of Object.values(PEOPLE)) {
       for (const line of person.lines) expect(line).not.toMatch(/board-real|board-fake/);
     }
+  });
+});
+
+describe("the White Rabbit's conversation", () => {
+  it("tells you which doors you still need, from the keys you hold", () => {
+    expect(rabbitGuidance([])).toMatch(/Cheshire.*Carbon Maze.*Greenwash/);
+    expect(rabbitGuidance(["cheshire"])).toMatch(/1 of 3.*Carbon Maze.*Greenwash/);
+    expect(rabbitGuidance(["cheshire", "caterpillar"])).toMatch(/2 of 3.*Greenwash/);
+    expect(rabbitGuidance(["cheshire", "caterpillar", "hatter"])).toMatch(/all three.*garden/i);
+  });
+
+  it("ignores keys that aren't garden keys", () => {
+    expect(rabbitGuidance(["queen"])).toMatch(/You need three key pieces/);
+  });
+
+  it("alternates guidance and carbon facts, cycling through every fact", () => {
+    expect(rabbitLine([], 0)).toBe(rabbitGuidance([]));
+    const facts = Array.from({ length: RABBIT_FACTS.length }, (_, n) => rabbitLine([], n * 2 + 1));
+    expect(facts).toEqual([...RABBIT_FACTS]);
+    expect(rabbitLine([], RABBIT_FACTS.length * 2 + 1)).toBe(RABBIT_FACTS[0]);
+  });
+
+  it("is safe for odd counts", () => {
+    expect(rabbitLine([], -5)).toBe(rabbitGuidance([]));
+    expect(rabbitLine([], 2.7)).toBe(rabbitGuidance([]));
   });
 });

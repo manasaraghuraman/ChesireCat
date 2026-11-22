@@ -7,6 +7,8 @@
  * Author: manasa
  * Date: 2026-11-22
  */
+import { GARDEN_KEYS } from "./constants";
+
 export const CAT_INSTRUCTIONS =
   "Two signposts, two ways to get to school, and one is much kinder to the planet. Read both signposts " +
   "carefully, then walk up to the one with the smaller carbon footprint and press E to take the key. " +
@@ -213,4 +215,37 @@ export function personLine(id: string, timesSpoken: number): string | null {
   if (!person || person.lines.length === 0) return null;
   const line = person.lines[((timesSpoken % person.lines.length) + person.lines.length) % person.lines.length];
   return `${person.name}: "${line}"`;
+}
+
+const ROOM_FOR_KEY: Readonly<Record<(typeof GARDEN_KEYS)[number], string>> = {
+  cheshire: "the Cheshire Cat's door",
+  caterpillar: "the Carbon Maze door",
+  hatter: "the Greenwash Check door",
+};
+
+/** What the White Rabbit tells you to do next, from the key pieces you hold. */
+export function rabbitGuidance(keys: readonly string[]): string {
+  const missing = GARDEN_KEYS.filter((piece) => !keys.includes(piece)).map((piece) => ROOM_FOR_KEY[piece]);
+  if (missing.length === 0) {
+    return "You have all three key pieces! The tiny garden door at the far end of the hall is waiting. I'm late, I'm late!";
+  }
+  if (missing.length === GARDEN_KEYS.length) {
+    return `Oh, hello Alice! You need three key pieces to open the garden. Try ${missing.join(", ")}.`;
+  }
+  return `You have ${GARDEN_KEYS.length - missing.length} of ${GARDEN_KEYS.length} key pieces. Still to find: ${missing.join(" and ")}.`;
+}
+
+export const RABBIT_FACTS: readonly string[] = [
+  "Everything has a carbon footprint: the CO2 released making it, moving it and powering it.",
+  "Short trips are the easiest to swap. If it's only a few minutes, walk or bike!",
+  "Wasted food rots and releases methane, a strong greenhouse gas. Buy only what you'll eat.",
+  "Switching things off when you leave a room saves electricity, and electricity often means burning fuel.",
+  "A product that says 'eco' needs proof you can check. Otherwise it might just be greenwashing.",
+];
+
+/** The Rabbit alternates: your next step first, then a carbon fact, cycling through the facts. */
+export function rabbitLine(keys: readonly string[], timesSpoken: number): string {
+  const turn = Math.max(0, Math.floor(timesSpoken));
+  if (turn % 2 === 0) return rabbitGuidance(keys);
+  return RABBIT_FACTS[Math.floor(turn / 2) % RABBIT_FACTS.length] ?? RABBIT_FACTS[0] ?? "";
 }

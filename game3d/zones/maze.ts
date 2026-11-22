@@ -11,7 +11,7 @@ import { emit, on } from "../../game/bridge";
 import { SCENE_HALL } from "../../lib/constants";
 import { BOARDS, judgeBoard, MAZE_EXIT_ID, MAZE_KEY_LESSON, PEOPLE, personLine, REAL_BOARD_IDS } from "../../lib/carbonContent";
 import { useGameStore } from "../../lib/state/store";
-import { createPerson } from "../entities/person";
+import { createPerson, type PersonStyle } from "../entities/person";
 import { panel } from "../labels";
 import type { LevelInteractable } from "../level";
 import { nearbyIds, PROXIMITY_METERS } from "../proximity";
@@ -19,7 +19,11 @@ import { flatMaterial } from "../scenery";
 import type { Zone, ZoneContext } from "./types";
 
 const SKY = 0x1c2340;
-const PERSON_COLORS = [0x3b82f6, 0x10b981, 0xf59e0b] as const;
+const PERSON_STYLES: readonly PersonStyle[] = [
+  { shirt: 0x3b82f6, pants: 0x2c3e5a, hair: 0x5b3a1e, skin: 0xe8b894 },
+  { shirt: 0x10b981, pants: 0x4a4a52, hair: 0x1c1c1c, skin: 0xc68a63 },
+  { shirt: 0xf59e0b, pants: 0x6b4a8c, hair: 0xd9b45a, skin: 0xf0c8a0 },
+];
 const isPerson = (id: string) => Object.hasOwn(PEOPLE, id);
 export { PROXIMITY_METERS };
 const BOARD_WIDTH_METERS = 2.8;
@@ -77,7 +81,8 @@ export function createMazeZone(): Zone {
       insidePeople = new Set();
       spoken.clear();
       people.forEach((item, index) => {
-        const person = createPerson(PEOPLE[item.id]?.name ?? "Person", PERSON_COLORS[index % PERSON_COLORS.length] ?? 0x3b82f6, item.pos);
+        const style = PERSON_STYLES[index % PERSON_STYLES.length] ?? PERSON_STYLES[0]!;
+        const person = createPerson(PEOPLE[item.id]?.name ?? "Person", style, item.pos, ctx.level?.spawn);
         ctx.root.add(person);
       });
       talk = (id: string) => {

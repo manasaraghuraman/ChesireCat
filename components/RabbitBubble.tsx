@@ -131,11 +131,9 @@ export default function RabbitBubble() {
     }
   }, [scene, playIntro]);
   useEffect(() => {
-    if (scene === SCENE_HALL && isRabbitChatOpen) {
-      setIsRabbitChatOpen(false);
-      playIntro();
-    }
-  }, [scene, isRabbitChatOpen, playIntro]);
+    // E on the Rabbit is handled by the Hall zone (a real conversation); just clear the flag.
+    if (scene === SCENE_HALL && isRabbitChatOpen) setIsRabbitChatOpen(false);
+  }, [scene, isRabbitChatOpen]);
 
   // Leaving the wood resets an unfinished twist (it replays next visit).
   useEffect(() => {

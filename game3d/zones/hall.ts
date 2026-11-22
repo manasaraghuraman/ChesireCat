@@ -48,7 +48,7 @@ export function hallInteractables(
     if (item.id === "garden-door") {
       return { ...item, enabled: hasAllKeys, label: hasAllKeys ? "the garden: unlock it with the Golden Key" : item.label };
     }
-    const piece = KEY_PIECES.find((p) => item.id === doorId(p));
+    const piece = HALL_DOOR_PIECES.find((p) => item.id === doorId(p));
     if (!piece) return item;
     return {
       ...item,
@@ -100,12 +100,14 @@ function checkerTexture(): THREE.CanvasTexture {
   return texture;
 }
 
-/** Positions of the four trial doors: [x, z, rotY]. Left wall faces +X, right wall faces −X. */
-const DOOR_PLACES: Record<KeyPieceType, readonly [number, number, number]> = {
+/** The doors that exist in the Hall: the Queen of Hearts' door was removed. */
+export const HALL_DOOR_PIECES: readonly KeyPieceType[] = KEY_PIECES.filter((piece) => piece !== "queen");
+
+/** Positions of the trial doors: [x, z, rotY]. Left wall faces +X, right wall faces −X. */
+const DOOR_PLACES: Partial<Record<KeyPieceType, readonly [number, number, number]>> = {
   caterpillar: [-4.98, -8, Math.PI / 2],
   cheshire: [-4.98, -20, Math.PI / 2],
   hatter: [4.98, -8, -Math.PI / 2],
-  queen: [4.98, -20, -Math.PI / 2],
 };
 
 export function createHallZone(): Zone {
@@ -141,8 +143,10 @@ export function createHallZone(): Zone {
       ctx.root.add(floor);
 
       const doors = new Map<KeyPieceType, Door>();
-      for (const piece of KEY_PIECES) {
-        const [x, z, rotY] = DOOR_PLACES[piece];
+      for (const piece of HALL_DOOR_PIECES) {
+        const place = DOOR_PLACES[piece];
+        if (!place) continue;
+        const [x, z, rotY] = place;
         const door = createDoor({ position: [x, 0, z], rotY, width: DOOR_WIDTH, height: DOOR_HEIGHT });
         ctx.root.add(door.group);
         doors.set(piece, door);
@@ -174,14 +178,14 @@ export function createHallZone(): Zone {
         id: RABBIT_ID,
         kind: "npc",
         pos: rabbit.head(),
-        radius: 0.6,
-        label: "the White Rabbit",
+        radius: 1.4,
+        label: "the White Rabbit (press E to talk)",
         enabled: true,
       };
 
       const base = ctx.level?.interactables ?? [];
       const refresh = (keys: readonly KeyPieceType[]) => {
-        for (const piece of KEY_PIECES) {
+        for (const piece of HALL_DOOR_PIECES) {
           const isOpen = Boolean(DOOR_ZONES[piece]);
           doors.get(piece)?.setState(keys.includes(piece) ? "earned" : isOpen ? "open" : "locked");
         }
@@ -196,9 +200,10 @@ export function createHallZone(): Zone {
           if (state.keys !== previous.keys) refresh(state.keys);
         }),
         on("interact", ({ id }) => {
-          const piece = KEY_PIECES.find((p) => id === doorId(p));
+          const piece = HALL_DOOR_PIECES.find((p) => id === doorId(p));
           const target = piece && DOOR_ZONES[piece];
           if (target) ctx.goTo(target);
+          else if (id === RABBIT_ID && rabbit) ctx.openDialogue("rabbit", rabbit.head());
           else if (id === "key-table") emit("sign-read", { text: keyTableText(useGameStore.getState().keys) });
           else if (id === "garden-door") {
             if (gardenApproach(useGameStore.getState().keys).isOpen) ctx.goTo(SCENE_GARDEN);
