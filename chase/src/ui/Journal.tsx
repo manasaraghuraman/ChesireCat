@@ -22,7 +22,7 @@ export function LevelSelect({
           <article class="entry" key={c.id}>
             <div>
               <h3>{c.name}</h3>
-              <small>
+              <small class={r.medal ? "best" : undefined}>
                 {r.best === null
                   ? "First run"
                   : r.best.toFixed(3) + " s · " + r.medal}
@@ -31,12 +31,18 @@ export function LevelSelect({
             </div>
             <button
               class="secondary"
+              aria-label={c.name + " times"}
+              aria-expanded={board === c.id}
               onClick={() => setBoard(board === c.id ? null : c.id)}
             >
               Times
             </button>
-            <button disabled={!ready} onClick={() => start(c.course)}>
-              Play {c.name}
+            <button
+              disabled={!ready}
+              aria-label={"Play " + c.name}
+              onClick={() => start(c.course)}
+            >
+              Play
             </button>
           </article>
         );

@@ -86,13 +86,29 @@ button {
   color: #183731;
   background: #f6ce91;
   border: 1px solid #ffe5b7;
-  border-radius: 3px;
+  border-radius: 6px;
   font: 700 1rem system-ui;
   padding: 1em 1.6em;
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 button:hover,
 button:focus-visible {
   background: #ffe6b8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(246, 206, 145, 0.25);
+}
+button:focus-visible {
+  outline: 2px solid #fff1d1;
+  outline-offset: 2px;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
 }
 button span {
   margin-right: 0.7em;
@@ -102,7 +118,37 @@ button span {
   bottom: 15vh;
   left: 6vw;
 }
+.panel input:not([type]),
+.panel input[type="text"] {
+  pointer-events: auto;
+  font: inherit;
+  color: #fff1d1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #bda87890;
+  border-radius: 6px;
+  padding: 0.55em 0.8em;
+  margin: 0.4rem 0 1rem;
+  width: 100%;
+}
+form.panel > label {
+  display: block;
+}
 @media (max-width: 739px) {
+  .runhud {
+    right: 1rem;
+    top: 1rem;
+    min-width: 0;
+  }
+  .hud {
+    left: 1rem;
+    bottom: 1rem;
+  }
+  .entry {
+    grid-template-columns: 1fr auto;
+  }
+  .entry > div {
+    grid-column: 1 / -1;
+  }
   #ui {
     align-content: end;
     padding-bottom: 13vh;
@@ -126,10 +172,15 @@ button span {
   }
 }
 .hud,
-.pause {
-  background: #15332ff5;
-  padding: 1rem 1.25rem;
-  border-radius: 4px;
+.pause,
+.runhud {
+  background: rgba(18, 44, 41, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(246, 206, 145, 0.35);
+  box-shadow: 0 8px 24px rgba(10, 25, 22, 0.25);
+  padding: 0.9rem 1.2rem;
+  border-radius: 10px;
   width: fit-content;
 }
 .hud {
@@ -157,18 +208,47 @@ button span {
   right: 2rem;
   top: 2rem;
   display: grid;
-  gap: 0.4rem;
-  background: #15332ff5;
-  border-radius: 4px;
-  padding: 1rem 1.25rem;
+  gap: 0.35rem;
+  min-width: 15rem;
   font-variant-numeric: tabular-nums;
 }
+.runhud strong {
+  color: #f4c98a;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
 .runhud b {
-  font-size: 1.7rem;
+  font:
+    normal 2.2rem/1.05 Georgia,
+    serif;
+  color: #fff7e4;
+}
+.runhud span,
+.runhud label {
+  font-size: 0.9rem;
+  color: #d6ded0;
 }
 .runhud progress {
   display: block;
-  accent-color: #c897ff;
+  width: 100%;
+  height: 8px;
+  margin-top: 0.35rem;
+  appearance: none;
+  border: 0;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+}
+.runhud progress::-webkit-progress-bar {
+  background: rgba(255, 255, 255, 0.15);
+}
+.runhud progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #9a6bdf, #d3a8ff);
+  border-radius: 99px;
+}
+.runhud progress::-moz-progress-bar {
+  background: linear-gradient(90deg, #9a6bdf, #d3a8ff);
 }
 .secondary {
   margin-left: 0.5rem;
@@ -179,9 +259,12 @@ button span {
   pointer-events: auto;
   width: min(39rem, 100%);
   padding: clamp(1.25rem, 3vw, 2.5rem);
-  background: #14322ff7;
+  background: rgba(18, 46, 42, 0.93);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid #bda87870;
-  border-radius: 5px;
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(5, 18, 16, 0.45);
   max-height: 85svh;
   overflow: auto;
 }
@@ -211,12 +294,30 @@ button span {
   color: #fff;
 }
 .entry {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem;
-  border-top: 1px solid #547069;
-  padding: 0.9rem 0;
+  gap: 0.6rem;
+  border-top: 1px solid #54706980;
+  padding: 0.8rem 0;
+}
+.entry:only-child,
+.entry:has(> div:only-child) {
+  grid-template-columns: 1fr;
+}
+.entry h3 {
+  font:
+    normal 1.2rem Georgia,
+    serif;
+  color: #fff1d1;
+}
+.entry .best {
+  color: #f4c98a;
+}
+.entry button {
+  margin: 0;
+  padding: 0.65em 1.2em;
+  min-width: 5.5rem;
 }
 .entry h3,
 .entry p {
@@ -246,7 +347,13 @@ button span {
   margin: 1rem 0;
 }
 .medal {
-  color: #f4c98a;
+  display: inline-block;
+  color: #183731;
+  background: linear-gradient(135deg, #ffe0a8, #e7a94f);
+  border-radius: 99px;
+  padding: 0.3em 0.9em;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
 }
 .panel dl {
   display: grid;
@@ -359,4 +466,49 @@ button span {
   .carbon-toast {
     animation: none;
   }
+}
+.eyebrow {
+  margin: 1.4rem 0 0.4rem;
+  color: #f4c98a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.lede {
+  margin: 0 0 1rem;
+  max-width: 34rem;
+}
+.keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  max-width: 36rem;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  color: #d6ded0;
+}
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.1em 0.45em;
+  margin-right: 0.3em;
+  font: 600 0.8rem system-ui;
+  text-align: center;
+  color: #fff1d1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #bda87890;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+}
+.pad {
+  margin: 0 0 1.4rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+.runhud .prank {
+  color: #ffb3a8;
+  font-weight: 700;
 }

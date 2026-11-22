@@ -3,82 +3,77 @@
   "name": "Last Call at the Cottage",
   "chapter": 1,
   "spawn": {
-    "pos": [0, 1, 11],
+    "pos": [0, 1, 12],
     "yaw": 0
   },
   "partitions": [
     {
-      "z": 9.1,
+      "z": 8,
       "doors": [
         {
-          "x": -3.4,
-          "width": 2.55,
+          "x": -5,
+          "width": 2.6,
           "room": "Scullery"
         },
         {
-          "x": 3.4,
-          "width": 2.65,
-          "room": "Pantry"
-        }
-      ]
-    },
-    {
-      "z": -5.2,
-      "doors": [
-        {
-          "x": 3.6,
+          "x": 5,
           "width": 2.6,
+          "room": "Kitchen"
+        }
+      ]
+    },
+    {
+      "z": -2,
+      "doors": [
+        {
+          "x": -6,
+          "width": 2.4,
           "room": "Boiler Room"
-        }
-      ]
-    },
-    {
-      "z": -18.2,
-      "doors": [
-        {
-          "x": -3.6,
-          "width": 2.65,
-          "room": "Laundry"
-        }
-      ]
-    },
-    {
-      "z": -38,
-      "doors": [
-        {
-          "x": 3.65,
-          "width": 2.55,
-          "room": "Back Kitchen Passage"
-        }
-      ]
-    },
-    {
-      "z": -39.3,
-      "doors": [
-        {
-          "x": 3.6,
-          "width": 2.65,
-          "room": "Back Kitchen"
         },
         {
-          "x": -3.7,
-          "width": 2.5,
-          "room": "Mud Room"
+          "x": 1,
+          "width": 2.4,
+          "room": "Hall"
+        },
+        {
+          "x": 6,
+          "width": 1.8,
+          "room": "Crawl Vent"
         }
       ]
     },
     {
-      "z": -42.6,
+      "z": -14,
+      "doors": [
+        {
+          "x": -6,
+          "width": 2.4,
+          "room": "Laundry"
+        },
+        {
+          "x": 0,
+          "width": 2.2,
+          "room": "Cracked Wall"
+        },
+        {
+          "x": 4,
+          "width": 2.6,
+          "room": "Study"
+        }
+      ]
+    },
+    {
+      "z": -27,
       "doors": [
         {
           "x": -4,
           "width": 2.6,
-          "room": "Back Passage"
+          "room": "Back Kitchen"
         },
         {
-          "x": 2,
-          "width": 2.2,
-          "room": "Radio Shelf"
+          "x": 5,
+          "width": 2.4,
+          "room": "Mud Room"
         }
       ]
     }
@@ -86,131 +81,242 @@
   "geometry": [
     {
       "shape": "box",
-      "pos": [1.85, 3.2, 7.775],
-      "size": [0.28, 6.4, 2.65],
+      "pos": [0, -0.5, -13],
+      "size": [18, 1, 54],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, 3.2, 6],
+      "size": [0.28, 6.4, 4],
       "tags": ["partition"]
     },
     {
       "shape": "box",
-      "pos": [0, -0.5, -5.5],
-      "size": [12, 1, 41],
-      "tags": ["floor"]
+      "pos": [0, 3.2, -0.2],
+      "size": [0.28, 6.4, 3.6],
+      "tags": ["partition"]
     },
     {
       "shape": "box",
-      "pos": [0, -0.5, -51.5],
-      "size": [12, 1, 7],
-      "tags": ["floor"]
-    },
-    {
-      "shape": "box",
-      "pos": [-4, -0.5, -45.5],
-      "size": [4, 1, 5],
-      "tags": ["floor"]
-    },
-    {
-      "shape": "box",
-      "pos": [2, -0.5, -45.35],
-      "size": [2.2, 1, 2.5],
-      "tags": ["floor"]
-    },
-    {
-      "shape": "box",
-      "pos": [0, 1.7, 1],
-      "size": [6, 2, 2],
-      "tags": ["floor"]
-    },
-    {
-      "shape": "box",
-      "pos": [0, 0.35, 1],
-      "size": [6, 0.7, 0.25],
+      "pos": [6, 0.35, -2],
+      "size": [1.8, 0.7, 0.3],
       "tags": ["vent"]
     },
     {
       "shape": "box",
-      "pos": [0, 1.6, -13],
-      "size": [6, 3.2, 0.6],
+      "pos": [6, 1.6749999999999998, -2],
+      "size": [1.8, 1.95, 0.45],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [-2.5, 3.2, -4.4],
+      "size": [0.28, 6.4, 4.8],
+      "tags": ["partition"]
+    },
+    {
+      "shape": "box",
+      "pos": [-2.5, 3.2, -11.6],
+      "size": [0.28, 6.4, 4.8],
+      "tags": ["partition"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, 1.325, -14],
+      "size": [2.2, 2.65, 0.45],
       "tags": ["breakable"]
     },
     {
       "shape": "box",
-      "pos": [0, -0.5, -38.0],
-      "size": [12, 1, 10],
-      "tags": ["floor"]
+      "pos": [-1, 3.2, -16.65],
+      "size": [0.28, 6.4, 5.3],
+      "tags": ["partition"]
     },
     {
       "shape": "box",
-      "pos": [-5, -0.5, -29.5],
-      "size": [2, 1, 7],
-      "tags": ["floor"]
+      "pos": [-1, 3.2, -24.35],
+      "size": [0.28, 6.4, 5.3],
+      "tags": ["partition"]
+    },
+    {
+      "shape": "box",
+      "pos": [2, 3.2, -30],
+      "size": [0.28, 6.4, 6],
+      "tags": ["partition"]
     }
   ],
   "leaks": [
     {
       "kind": "big",
       "type": "water_heater",
-      "pos": [0, 0, 6],
+      "pos": [-5, 0, 3],
       "required": true
     },
     {
       "kind": "big",
       "type": "thermostat",
-      "pos": [0, 0, -9],
+      "pos": [-6.5, 0, -10],
       "required": true
     },
     {
       "kind": "big",
       "type": "dryer",
-      "pos": [0, 0, -23],
+      "pos": [-5.5, 0, -20],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "light",
+      "pos": [-3.25, 1, 7.51],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "light",
+      "pos": [3.25, 1, 7.51],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "light",
+      "pos": [-4.35, 1, -2.49],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "light",
+      "pos": [2.65, 1, -2.49],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "light",
+      "pos": [-4.35, 1, -14.49],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "light",
+      "pos": [5.75, 1, -14.49],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "light",
+      "pos": [-2.25, 1, -27.49],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "stove",
+      "pos": [1.06, 1, 6.5],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "faucet",
+      "pos": [3.6, 1, -1.04],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "tv",
+      "pos": [-1.64, 1, -4.5],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "computer",
+      "pos": [0.02, 1, -17],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "space_heater",
+      "pos": [1.8, 1, -26.28],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "laundry",
+      "pos": [-1.94, 1, -25],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "drip",
+      "pos": [-3, 1, -1.13],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "charger",
+      "pos": [7, 1, -13.13],
       "required": true
     },
     {
       "kind": "small",
       "type": "standby",
-      "pos": [4.35, 1, -41.0],
-      "required": false
+      "pos": [-1.63, 1, -12],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "fan",
+      "pos": [1.16, 1, -30],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "stove",
+      "pos": [-6.5, 1, -28.06],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "tv",
+      "pos": [2.86, 1, -31],
+      "required": true
     }
   ],
   "rabbitPath": [
-    [0, 0, 11],
-    [-3.4, 0, 10.1],
-    [-3.4, 0, 7.9],
-    [-4.9, 0, 2.5],
-    [-4.9, 0, -1.1],
-    [3.6, 0, -3.9],
-    [3.6, 0, -6.6],
-    [-4.9, 0, -11.8],
-    [-4.9, 0, -14.4],
-    [-3.6, 0, -17],
-    [-3.6, 0, -20],
-    [-4.9, 0, -25.5],
-    [-4.9, 0, -34.5],
-    [3.65, 0, -36.8],
-    [3.65, 0, -40],
-    [-4, 0, -41],
-    [-4, 0, -44],
-    [-4, 0, -49]
+    [0.13, 0, 10.88],
+    [-5.37, 0, 10.88],
+    [-5.37, 0, -14.62],
+    [-3.37, 0, -14.62],
+    [-3.37, 0, -27.62],
+    [0.13, 0, -27.62],
+    [0, 0, -38]
   ],
   "rabbitHole": {
-    "pos": [0, 0, -51]
-  },
-  "glove": {
-    "pos": [5, 1, -53]
+    "pos": [0, 0, -38]
   },
   "soldiers": [
     {
       "path": [
-        [3, 0, 7],
-        [2, 0, 2]
+        [5.5, 0, -4],
+        [5.5, 0, -11]
       ],
-      "speed": 2.0
+      "speed": 1.4
+    },
+    {
+      "path": [
+        [-6, 0, -33],
+        [-1, 0, -33]
+      ],
+      "speed": 1.5
     }
   ],
   "smogZones": [
     {
-      "pos": [-3, 1, 4],
-      "size": [3, 2.5, 5],
-      "linkedLeak": 0
+      "pos": [-6.5, 1, 0],
+      "size": [3, 2.5, 2.5],
+      "linkedLeak": 16
     }
-  ]
+  ],
+  "rabbitMischief": 4,
+  "glove": {
+    "pos": [8, 1, -39]
+  }
 }

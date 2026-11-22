@@ -17,6 +17,11 @@ export class Hazards {
   arrived = false;
   readonly soldiers;
   inSmog = false;
+  /** The Rabbit's current prank: which task, when it started, and whether it has flipped yet. */
+  prank: { leak: number; start: number; relit: boolean } | null = null;
+  pranks = 0;
+  private nextPrank = 0;
+  private arrivedAt = -1;
   constructor(readonly level: LevelData) {
     this.spline = level.rabbitPath.length
       ? new CatmullRomCurve3(level.rabbitPath.map(vector))
@@ -51,6 +56,10 @@ export class Hazards {
     }
   }
   reset() {
+    this.prank = null;
+    this.pranks = 0;
+    this.nextPrank = 0;
+    this.arrivedAt = -1;
     this.sample(0);
     this.rabbit.previous.copy(this.rabbit.pos);
     for (const s of this.soldiers) {
@@ -59,12 +68,72 @@ export class Hazards {
     }
     this.inSmog = false;
   }
-  tick(worldTicks: number, physics: TrainingWorld, progress: number[]) {
+  /**
+   * After reaching the hole the Rabbit periodically pops over to the task the
+   * player finished longest ago and switches it back on. Choices depend only on
+   * simulation state, so runs stay deterministic.
+   */
+  private mischief(
+    seconds: number,
+    p: { x: number; z: number },
+    progress: number[],
+    splits: readonly number[],
+    allowed: boolean,
+  ) {
+    const prank = this.prank;
+    if (prank) {
+      const age = seconds - prank.start;
+      if (!prank.relit && age >= h.mischiefRelightAt) {
+        prank.relit = true;
+        if (progress[prank.leak] === ringTicks) progress[prank.leak] = 0;
+      }
+      if (age < h.mischiefVisit) {
+        const [x, y, z] = this.level.leaks[prank.leak].pos;
+        const away = new Vector3(p.x - x, 0, p.z - z);
+        if (away.lengthSq() < 1e-6) away.set(0, 0, 1);
+        away.normalize().multiplyScalar(0.85);
+        this.rabbit.pos.set(x + away.x, Math.max(0, y - 1), z + away.z);
+        this.rabbit.yaw = Math.atan2(-away.x, -away.z);
+        return;
+      }
+      this.prank = null;
+      this.rabbit.previous.copy(this.rabbit.pos);
+      this.nextPrank = seconds + h.mischiefEvery;
+      return;
+    }
+    if (!this.arrived || this.pranks >= this.level.rabbitMischief || !allowed)
+      return;
+    if (this.arrivedAt < 0) {
+      this.arrivedAt = seconds;
+      this.nextPrank = seconds + h.mischiefDelay;
+    }
+    if (seconds < this.nextPrank) return;
+    let pick = -1;
+    for (const [i, l] of this.level.leaks.entries()) {
+      if (l.kind !== "small" || progress[i] !== ringTicks) continue;
+      if (Math.hypot(l.pos[0] - p.x, l.pos[2] - p.z) < h.mischiefClearance)
+        continue;
+      if (pick < 0 || (splits[i] ?? 0) < (splits[pick] ?? 0)) pick = i;
+    }
+    if (pick < 0) return;
+    this.pranks++;
+    this.prank = { leak: pick, start: seconds, relit: false };
+    this.mischief(seconds, p, progress, splits, allowed);
+    this.rabbit.previous.copy(this.rabbit.pos);
+  }
+  tick(
+    worldTicks: number,
+    physics: TrainingWorld,
+    progress: number[],
+    splits: readonly number[] = [],
+    mischiefAllowed = true,
+  ) {
     this.rabbit.previous.copy(this.rabbit.pos);
     for (const s of this.soldiers) s.previous.copy(s.pos);
     this.sample(worldTicks * DT);
     const p = physics.body.translation(),
       radius = physics.capsule.radius();
+    this.mischief(worldTicks * DT, p, progress, splits, mischiefAllowed);
     for (const s of this.soldiers) {
       for (const [i, l] of this.level.leaks.entries()) {
         if (

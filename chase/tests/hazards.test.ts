@@ -113,3 +113,49 @@ it("pushes the player out of the heater ring at six metres per second and preser
     world.world.free();
   }
 });
+
+it("lets the Rabbit switch back on the task finished longest ago, then return to the hole", () => {
+  const level = parseLevel(source);
+  level.rabbitMischief = 1;
+  level.soldiers = [];
+  level.leaks = level.leaks.map((l) => ({
+    ...l,
+    kind: "small" as const,
+    required: true,
+  }));
+  const { world, run, step } = setup(level);
+  try {
+    step(1);
+    // Two tasks done; a third left open so the exit stays sealed.
+    run.progress[0] = ringTicks;
+    run.splits[0] = 5;
+    run.progress[1] = ringTicks;
+    run.splits[1] = 2;
+    run.progress[2] = 0;
+    // Stand far from both tasks so the Rabbit is willing to prank.
+    world.body.setTranslation({ x: 40, y: 1, z: 40 }, true);
+    let relit = -1;
+    for (let t = 0; t < 120 * 60 && relit < 0; t++) {
+      step(1);
+      if (run.progress[1] === 0) relit = 1;
+      if (run.progress[0] === 0) relit = 0;
+    }
+    expect(relit).toBe(1);
+    expect(run.relit?.index).toBe(1);
+    expect(run.splits[1]).toBeUndefined();
+    expect(run.hazards.prank).not.toBeNull();
+    step(Math.ceil(HAZARDS.mischiefVisit * 120));
+    expect(run.hazards.prank).toBeNull();
+    expect(run.hazards.rabbit.pos.toArray()).toEqual(run.level.exit);
+    // The prank budget is spent, so finished tasks now stay finished.
+    run.progress[1] = ringTicks;
+    step(120 * 40);
+    expect(run.progress[1]).toBe(ringTicks);
+    expect(run.hazards.pranks).toBe(1);
+    run.reset();
+    expect(run.hazards.pranks).toBe(0);
+    expect(run.relit).toBeNull();
+  } finally {
+    world.world.free();
+  }
+});

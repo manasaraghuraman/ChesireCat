@@ -1,10 +1,60 @@
 {
   "small": {
-    "light": { "timeCutSeconds": 0.1, "impactKgPerYear": null, "tip": null },
-    "charger": { "timeCutSeconds": 0.1, "impactKgPerYear": null, "tip": null },
-    "drip": { "timeCutSeconds": 0.1, "impactKgPerYear": null, "tip": null },
-    "laundry": { "timeCutSeconds": 0, "impactKgPerYear": null, "tip": null },
-    "standby": { "timeCutSeconds": 0.2, "impactKgPerYear": null, "tip": null }
+    "light": {
+      "timeCutSeconds": 0.1,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "charger": {
+      "timeCutSeconds": 0.1,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "drip": {
+      "timeCutSeconds": 0.1,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "laundry": {
+      "timeCutSeconds": 0,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "standby": {
+      "timeCutSeconds": 0.2,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "stove": {
+      "timeCutSeconds": 0.3,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "tv": {
+      "timeCutSeconds": 0.2,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "faucet": {
+      "timeCutSeconds": 0.1,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "computer": {
+      "timeCutSeconds": 0.2,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "fan": {
+      "timeCutSeconds": 0.1,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "space_heater": {
+      "timeCutSeconds": 0.3,
+      "impactKgPerYear": null,
+      "tip": null
+    }
   },
   "big": {
     "water_heater": {

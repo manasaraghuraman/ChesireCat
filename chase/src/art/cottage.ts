@@ -137,9 +137,8 @@ export function furnishCottage(group: T.Group, level: LevelData) {
         [door.width + 0.27, 0.18, 0.41],
         [door.x, doorwayHeight + 0.07, partition.z],
       );
-      const sign = label(door.room);
+      const sign = label(door.room, 0.29);
       sign.position.set(door.x, doorwayHeight + 0.34, partition.z + 0.23);
-      sign.scale.set(1.65, 0.29, 1);
       group.add(sign);
     }
     for (const wall of level.boxes) {

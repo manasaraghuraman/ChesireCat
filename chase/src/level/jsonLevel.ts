@@ -1,5 +1,5 @@
 import rules from "../config/leaks.json";
-import { footprintActions, footprintChallenge } from "../config/footprint";
+import { footprintActions } from "../config/footprint";
 import {
   cottageBounds,
   cottageShell,
@@ -19,6 +19,10 @@ export interface LevelData {
   id: string;
   name: string;
   footprintChallenge?: boolean;
+  /** Footprint points at the start and the goal that opens the Rabbit hole. */
+  footprint?: { start: number; target: number };
+  /** How many times the Rabbit may switch a finished task back on. */
+  rabbitMischief: number;
   spawn: { x: number; y: number; z: number };
   yaw: number;
   boxes: Box[];
@@ -150,21 +154,33 @@ export function parseLevel(value: unknown): LevelData {
       timeCut: catalog[l.type].timeCutSeconds,
     };
   });
+  let footprint: LevelData["footprint"];
   if (raw.footprintChallenge === true) {
-    const points = leaks.reduce(
+    const start = leaks.reduce(
       (sum, leak) => sum + (footprintActions[leak.type]?.points ?? 0),
       0,
     );
+    const target = raw.footprintTarget ?? 0;
     if (
       leaks.some(
         (leak) =>
           leak.kind !== "small" || !Object.hasOwn(footprintActions, leak.type),
       ) ||
-      points < footprintChallenge.start - footprintChallenge.target ||
-      points > footprintChallenge.start
+      typeof target !== "number" ||
+      !Number.isInteger(target) ||
+      target < 0 ||
+      target >= start
     )
       throw Error("Invalid footprint challenge actions");
+    footprint = { start, target };
   }
+  const mischief = raw.rabbitMischief ?? 0;
+  if (
+    typeof mischief !== "number" ||
+    !Number.isInteger(mischief) ||
+    mischief < 0
+  )
+    throw Error("Invalid rabbit mischief count");
   const exit = point(record(raw.rabbitHole).pos),
     rabbitPath = path(raw.rabbitPath);
   if (rabbitPath.length && rabbitPath.at(-1)!.some((v, i) => v !== exit[i]))
@@ -198,6 +214,8 @@ export function parseLevel(value: unknown): LevelData {
     id: raw.id,
     name: raw.name,
     footprintChallenge: raw.footprintChallenge === true,
+    footprint,
+    rabbitMischief: mischief,
     spawn: { x, y, z },
     yaw: spawn.yaw,
     boxes: partitions.length
