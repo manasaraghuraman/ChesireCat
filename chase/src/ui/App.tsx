@@ -288,11 +288,13 @@ export function App({
           </p>
         </section>
         <Commentary run={run} medal={medal(course.id, run.finalTime)} />
-        <Leaderboard
-          id={course.id}
-          afterFinish
-          race={() => start(course.course)}
-        />
+        {!isEmbedded && (
+          <Leaderboard
+            id={course.id}
+            afterFinish
+            race={() => start(course.course)}
+          />
+        )}
         {save.ghostIsSessionOnly(course.id) && (
           <p role="status">
             Browser storage is full. Your ghost is available for this session.

@@ -3,9 +3,14 @@ import type { LevelRun } from "../level/run";
 import type { LevelId } from "../config/courses";
 import { decode, encode, type Track } from "../replay/codec";
 import { ringTicks } from "../config/ring";
+import { isEmbedded } from "../embed";
 const url = import.meta.env.VITE_SUPABASE_URL,
   key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-export const online = url && key ? createClient(url, key) : null;
+/**
+ * Supabase powers the standalone game's online features (leaderboards, shared ghosts, AI commentary).
+ * Inside the Cheshire Cat game's iframe the chase stays fully local: no client, no sign-in, no network.
+ */
+export const online = url && key && !isEmbedded ? createClient(url, key) : null;
 let name = "";
 try {
   name = localStorage.getItem("rabbit.display-name") ?? "";
