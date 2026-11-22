@@ -1,0 +1,161 @@
+{
+  "id": "c1_l3",
+  "name": "The Boiler Room",
+  "chapter": 1,
+  "spawn": {
+    "pos": [0, 1, 11],
+    "yaw": 0
+  },
+  "partitions": [
+    {
+      "z": 8.3,
+      "doors": [
+        {
+          "x": -3.5,
+          "width": 2.65,
+          "room": "Boiler Room"
+        },
+        {
+          "x": 3.6,
+          "width": 2.35,
+          "room": "Utility Passage"
+        }
+      ]
+    },
+    {
+      "z": -8.7,
+      "doors": [
+        {
+          "x": -3.7,
+          "width": 2.6,
+          "room": "Washroom"
+        },
+        {
+          "x": 3.8,
+          "width": 2.45,
+          "room": "Pipe Alcove"
+        }
+      ]
+    },
+    {
+      "z": -12.1,
+      "doors": [
+        {
+          "x": 3.75,
+          "width": 2.6,
+          "room": "Washroom Passage"
+        }
+      ]
+    },
+    {
+      "z": -18.7,
+      "doors": [
+        {
+          "x": -4,
+          "width": 2.65,
+          "room": "Cellar Landing"
+        },
+        {
+          "x": 2,
+          "width": 2.2,
+          "room": "Radio Shelf"
+        }
+      ]
+    }
+  ],
+  "geometry": [
+    {
+      "shape": "box",
+      "pos": [1.62, 3.2, 6.4],
+      "size": [0.28, 6.4, 3.8],
+      "tags": ["partition"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, -0.5, -2.5],
+      "size": [12, 1, 35],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, -0.5, -28.5],
+      "size": [12, 1, 7],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [-4, -0.5, -22.5],
+      "size": [4, 1, 5],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [2, -0.5, -22.35],
+      "size": [2.2, 1, 2.5],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, 1.6, 1],
+      "size": [6, 3.2, 0.6],
+      "tags": ["breakable"]
+    }
+  ],
+  "leaks": [
+    {
+      "kind": "big",
+      "type": "thermostat",
+      "pos": [0, 0, 5],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "drip",
+      "pos": [0, 1, -14],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "standby",
+      "pos": [4.4, 1, -16.0],
+      "required": false
+    }
+  ],
+  "rabbitPath": [
+    [0, 0, 10],
+    [-3.5, 0, 9.5],
+    [-3.5, 0, 7.1],
+    [-4.9, 0, 2.5],
+    [-4.9, 0, -1.1],
+    [3.8, 0, -7],
+    [3.8, 0, -10],
+    [3.75, 0, -11],
+    [3.75, 0, -13.1],
+    [-3, 0, -15.5],
+    [-4, 0, -17.4],
+    [-4, 0, -20],
+    [-4, 0, -25]
+  ],
+  "rabbitHole": {
+    "pos": [0, 0, -28]
+  },
+  "glove": {
+    "pos": [5, 1, -30]
+  },
+  "soldiers": [
+    {
+      "path": [
+        [3, 0, 7],
+        [2, 0, 2]
+      ],
+      "speed": 1.6
+    }
+  ],
+  "smogZones": [
+    {
+      "pos": [-3, 1, 4],
+      "size": [3, 2.5, 5],
+      "linkedLeak": 0
+    }
+  ]
+}

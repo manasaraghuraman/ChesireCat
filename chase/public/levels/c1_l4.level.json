@@ -1,0 +1,142 @@
+{
+  "id": "c1_l4",
+  "name": "Laundry Leap",
+  "chapter": 1,
+  "spawn": {
+    "pos": [0, 1, 11],
+    "yaw": 0
+  },
+  "partitions": [
+    {
+      "z": 7.1,
+      "doors": [
+        { "x": -3.4, "width": 2.55, "room": "Laundry" },
+        { "x": 3.4, "width": 2.55, "room": "Linen Room" }
+      ]
+    },
+    {
+      "z": -17.4,
+      "doors": [{ "x": 3.4, "width": 2.65, "room": "Mending Room" }]
+    },
+    {
+      "z": -23,
+      "doors": [
+        { "x": -3.9, "width": 2.65, "room": "Service Hall" },
+        { "x": 3.6, "width": 2.55, "room": "Ironing Room" }
+      ]
+    },
+    {
+      "z": -25.8,
+      "doors": [
+        { "x": -4, "width": 2.6, "room": "Back Landing" },
+        { "x": 2, "width": 2.2, "room": "Radio Shelf" }
+      ]
+    }
+  ],
+  "geometry": [
+    {
+      "shape": "box",
+      "pos": [1.76, 3.2, 5.75],
+      "size": [0.28, 6.4, 2.7],
+      "tags": ["partition"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, -0.5, 7.5],
+      "size": [12, 1, 15],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, -0.5, -33.5],
+      "size": [12, 1, 7],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [-4, -0.5, -27.5],
+      "size": [4, 1, 5],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [2, -0.5, -27.35],
+      "size": [2.2, 1, 2.5],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, -0.5, -16.0],
+      "size": [12, 1, 18],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [-5, -0.5, -3.5],
+      "size": [2, 1, 7],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [-1.65, 3.2, -20.6],
+      "size": [0.28, 6.4, 4.75],
+      "tags": ["partition"]
+    }
+  ],
+  "leaks": [
+    {
+      "kind": "big",
+      "type": "dryer",
+      "pos": [0, 0, 3],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "charger",
+      "pos": [0, 1, -24],
+      "required": true
+    },
+    {
+      "kind": "small",
+      "type": "standby",
+      "pos": [4.4, 1, -21.2],
+      "required": false
+    }
+  ],
+  "rabbitPath": [
+    [0, 0, 10],
+    [-3.4, 0, 8.3],
+    [-3.4, 0, 5.9],
+    [-4.9, 0, 0.6],
+    [-4.9, 0, -8.4],
+    [3.4, 0, -16],
+    [3.4, 0, -19],
+    [3.6, 0, -21.7],
+    [3.6, 0, -24.1],
+    [-4, 0, -24.5],
+    [-4, 0, -27],
+    [-4, 0, -31]
+  ],
+  "rabbitHole": {
+    "pos": [0, 0, -33]
+  },
+  "glove": {
+    "pos": [5, 1, -35]
+  },
+  "soldiers": [
+    {
+      "path": [
+        [3, 0, 7],
+        [2, 0, 2]
+      ],
+      "speed": 1.8
+    }
+  ],
+  "smogZones": [
+    {
+      "pos": [-3, 1, 4],
+      "size": [3, 2.5, 5],
+      "linkedLeak": 0
+    }
+  ]
+}

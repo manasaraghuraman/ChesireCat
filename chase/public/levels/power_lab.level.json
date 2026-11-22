@@ -1,0 +1,156 @@
+{
+  "id": "power_lab",
+  "name": "Power-up lab",
+  "chapter": 1,
+  "spawn": { "pos": [0, 1, 12], "yaw": 0 },
+  "partitions": [
+    {
+      "z": 10,
+      "doors": [
+        {
+          "x": -5.3,
+          "width": 3,
+          "room": "Utility Workshop"
+        },
+        {
+          "x": 5.3,
+          "width": 3,
+          "room": "Tool Store"
+        }
+      ]
+    },
+    {
+      "z": -3.8,
+      "doors": [
+        {
+          "x": 5.8,
+          "width": 3.1,
+          "room": "Heating Room"
+        }
+      ]
+    },
+    {
+      "z": -12.4,
+      "doors": [
+        {
+          "x": -5.4,
+          "width": 3,
+          "room": "Laundry"
+        },
+        {
+          "x": 5.4,
+          "width": 3,
+          "room": "Workshop"
+        }
+      ]
+    },
+    {
+      "z": -20,
+      "doors": [
+        {
+          "x": 5.3,
+          "width": 3.2,
+          "room": "Workshop Passage"
+        },
+        {
+          "x": -5.35,
+          "width": 2.7,
+          "room": "Tool Corridor"
+        }
+      ]
+    },
+    {
+      "z": -29,
+      "doors": [
+        {
+          "x": -5.7,
+          "width": 3,
+          "room": "Cold Pantry"
+        }
+      ]
+    },
+    {
+      "z": -38,
+      "doors": [
+        {
+          "x": 5.6,
+          "width": 3.1,
+          "room": "Kitchen"
+        }
+      ]
+    },
+    {
+      "z": -50,
+      "doors": [
+        {
+          "x": -5.5,
+          "width": 3,
+          "room": "Back Hall"
+        },
+        {
+          "x": 5.5,
+          "width": 3,
+          "room": "Boot Room"
+        }
+      ]
+    }
+  ],
+  "geometry": [
+    {
+      "shape": "box",
+      "pos": [2.45, 3.2, 8.5],
+      "size": [0.28, 6.4, 3],
+      "tags": ["partition"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, -0.5, -23],
+      "size": [22, 1, 78],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, 1.4, 1],
+      "size": [7, 1.4, 4],
+      "tags": ["floor"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, 0.35, 1],
+      "size": [7, 0.7, 0.25],
+      "tags": ["vent"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, 1.7, -10],
+      "size": [7, 3.4, 0.45],
+      "tags": ["breakable"]
+    },
+    {
+      "shape": "box",
+      "pos": [0, 1.7, -47],
+      "size": [7, 3.4, 0.5],
+      "tags": ["phaseable"]
+    }
+  ],
+  "leaks": [
+    {
+      "kind": "big",
+      "type": "water_heater",
+      "pos": [0, 0, 7],
+      "required": true
+    },
+    {
+      "kind": "big",
+      "type": "thermostat",
+      "pos": [0, 0, -6],
+      "required": true
+    },
+    { "kind": "big", "type": "dryer", "pos": [0, 0, -15], "required": true },
+    { "kind": "big", "type": "car_keys", "pos": [0, 0, -25], "required": true },
+    { "kind": "big", "type": "fridge", "pos": [0, 0, -34], "required": true },
+    { "kind": "big", "type": "oven", "pos": [0, 0, -42], "required": true }
+  ],
+  "rabbitHole": { "pos": [0, 0, -55] },
+  "glove": { "pos": [-8, 1, -34] }
+}

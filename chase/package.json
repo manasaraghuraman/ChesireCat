@@ -1,0 +1,27 @@
+{
+  "name": "carbon-chase",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "lil-gui": "0.21.0",
+    "postprocessing": "6.38.0",
+    "preact": "10.29.8",
+    "stats.js": "0.17.0",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "2.10.6",
+    "@types/stats.js": "0.17.4",
+    "@types/three": "0.180.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.8",
+    "vitest": "4.1.12"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "small": {
+    "light": { "timeCutSeconds": 0.1, "impactKgPerYear": null, "tip": null },
+    "charger": { "timeCutSeconds": 0.1, "impactKgPerYear": null, "tip": null },
+    "drip": { "timeCutSeconds": 0.1, "impactKgPerYear": null, "tip": null },
+    "laundry": { "timeCutSeconds": 0, "impactKgPerYear": null, "tip": null },
+    "standby": { "timeCutSeconds": 0.2, "impactKgPerYear": null, "tip": null }
+  },
+  "big": {
+    "water_heater": {
+      "powerup": "drink_me",
+      "timeCutSeconds": 1.5,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "thermostat": {
+      "powerup": "eat_me",
+      "timeCutSeconds": 2,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "dryer": {
+      "powerup": "flamingo",
+      "timeCutSeconds": 1,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "car_keys": {
+      "powerup": "hatter_hop",
+      "timeCutSeconds": 2,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "fridge": {
+      "powerup": "tea_time",
+      "timeCutSeconds": 0.8,
+      "impactKgPerYear": null,
+      "tip": null
+    },
+    "oven": {
+      "powerup": "cheshire",
+      "timeCutSeconds": 0.8,
+      "impactKgPerYear": null,
+      "tip": null
+    }
+  },
+  "ringSeconds": 3,
+  "ringRadius": 2,
+  "ringHeight": 4,
+  "smallRadius": 0.65,
+  "exitRadius": 1.15
+}
