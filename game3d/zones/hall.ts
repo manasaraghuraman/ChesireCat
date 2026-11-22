@@ -11,7 +11,7 @@ import { emit, on } from "../../game/bridge";
 import { GARDEN_KEYS, KEY_PIECES, SCENE_CHESHIRE, SCENE_HALL, SCENE_MAZE, SCENE_CLUES } from "../../lib/constants";
 import type { KeyPieceType } from "../../lib/schemas";
 import { useGameStore } from "../../lib/state/store";
-import { GARDEN_LESSON } from "../../lib/mediaLiteracy";
+import { GARDEN_LESSON } from "../../lib/carbonContent";
 import { createDoor, type Door } from "../entities/door";
 import { createKeyTable } from "../entities/keyTable";
 import { createWhiteRabbit, type WhiteRabbit } from "../entities/whiteRabbit";
@@ -30,9 +30,9 @@ const DOOR_ZONES: Partial<Record<KeyPieceType, string>> = {
 const DOOR_WIDTH = 1.2;
 const DOOR_HEIGHT = 2.4;
 const PIECE_NAMES: Record<KeyPieceType, string> = {
-  caterpillar: "News Maze",
+  caterpillar: "Carbon Maze",
   cheshire: "Cheshire Cat",
-  hatter: "Clue Room",
+  hatter: "Greenwash Check",
   queen: "Queen of Hearts",
 };
 

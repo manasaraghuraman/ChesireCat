@@ -10,7 +10,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Down the Rabbit Hole",
-  description: "An online-safety game: see through every trick to reach the garden.",
+  description: "A carbon-footprint game: make low-carbon choices to reach the garden.",
 };
 
 export default function RootLayout({ children }: { readonly children: ReactNode }) {

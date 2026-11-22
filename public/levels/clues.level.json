@@ -1,6 +1,6 @@
 {
  "id": "clues",
- "name": "The Clue Room",
+ "name": "The Greenwash Check",
  "spawn": {
   "pos": [
    0,
@@ -96,72 +96,72 @@
    "id": "clue-1",
    "kind": "sign",
    "pos": [
-    -7.5,
+    -10,
     2.1,
     0
    ],
    "radius": 1.5,
-   "label": "a clue",
+   "label": "an evidence card",
    "enabled": true
   },
   {
    "id": "clue-2",
    "kind": "sign",
    "pos": [
-    -2.5,
+    -6,
     2.1,
     0
    ],
    "radius": 1.5,
-   "label": "a clue",
+   "label": "an evidence card",
    "enabled": true
   },
   {
    "id": "clue-3",
    "kind": "sign",
    "pos": [
-    2.5,
+    -2,
     2.1,
     0
    ],
    "radius": 1.5,
-   "label": "a clue",
+   "label": "an evidence card",
    "enabled": true
   },
   {
    "id": "clue-4",
    "kind": "sign",
    "pos": [
-    7.5,
+    2,
     2.1,
     0
    ],
    "radius": 1.5,
-   "label": "a clue",
+   "label": "an evidence card",
    "enabled": true
   },
   {
-   "id": "verdict-real",
+   "id": "clue-5",
    "kind": "sign",
    "pos": [
-    -4,
+    6,
     2.1,
-    -9
+    0
    ],
    "radius": 1.5,
-   "label": "verdict: REAL",
+   "label": "an evidence card",
    "enabled": true
   },
   {
-   "id": "verdict-fake",
+   "id": "clue-6",
    "kind": "sign",
    "pos": [
-    4,
+    10,
     2.1,
-    -9
+    0
    ],
    "radius": 1.5,
-   "label": "verdict: FAKE",
+   "label": "an evidence card",
    "enabled": true
   },
   {

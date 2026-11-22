@@ -1,6 +1,6 @@
 {
  "id": "maze",
- "name": "The News Maze",
+ "name": "The Carbon Maze",
  "spawn": {
   "pos": [
    -12,
@@ -1009,7 +1009,7 @@
     -3
    ],
    "radius": 1.5,
-   "label": "a news board",
+   "label": "a choice board",
    "enabled": true
   },
   {
@@ -1045,7 +1045,7 @@
     3
    ],
    "radius": 1.5,
-   "label": "a news board",
+   "label": "a choice board",
    "enabled": true
   },
   {
@@ -1057,7 +1057,7 @@
     9
    ],
    "radius": 1.5,
-   "label": "a news board",
+   "label": "a choice board",
    "enabled": true
   },
   {
@@ -1069,7 +1069,7 @@
     9
    ],
    "radius": 1.5,
-   "label": "a news board",
+   "label": "a choice board",
    "enabled": true
   },
   {
@@ -1081,7 +1081,7 @@
     9
    ],
    "radius": 1.5,
-   "label": "a news board",
+   "label": "a choice board",
    "enabled": true
   },
   {
@@ -1093,7 +1093,7 @@
     9
    ],
    "radius": 1.5,
-   "label": "a news board",
+   "label": "a choice board",
    "enabled": true
   },
   {
@@ -1105,7 +1105,7 @@
     9
    ],
    "radius": 1.5,
-   "label": "the maze exit (collect 3 trustworthy sources first)",
+   "label": "the maze exit (collect 3 low-carbon choices first)",
    "enabled": false
   }
  ],

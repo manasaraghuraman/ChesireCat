@@ -19,7 +19,7 @@ function level(id: string) {
 describe("hall", () => {
   const base = level("hall").interactables;
 
-  it("opens exactly the Cheshire, News Maze and Clue Room doors and keeps the garden locked", () => {
+  it("opens exactly the Cheshire, Carbon Maze and Greenwash Check doors and keeps the garden locked", () => {
     const items = hallInteractables(base, []);
     const enabled = items.filter((i) => i.kind === "door" && i.enabled).map((i) => i.id);
     expect(enabled.sort()).toEqual([`door-caterpillar`, `door-hatter`, `door-${DEMO_UNLOCKED_DOOR}`].sort());

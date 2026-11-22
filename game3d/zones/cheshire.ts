@@ -1,14 +1,14 @@
 /**
  * File: game3d/zones/cheshire.ts
  * Purpose: SCENE_CHESHIRE, the Tulgey Wood. The Cheshire Cat only gives instructions (E on it shows
- *          them). Two signposts: pressing E on the real shop's signpost awards the key; the other says
+ *          them). Two signposts: pressing E on the lower-carbon signpost awards the key; the other says
  *          why it is wrong. The door at the back returns to the Hall of Doors. Rules live in
- *          lib/mediaLiteracy.ts; this zone only stages them.
+ *          lib/carbonContent.ts; this zone only stages them.
  * Date: 2026-11-22
  */
 import * as THREE from "three";
 import { emit, on } from "../../game/bridge";
-import { CAT_INSTRUCTIONS, CHESHIRE_LESSON, judgeSignpost, SIGN_TEXT } from "../../lib/mediaLiteracy";
+import { CAT_INSTRUCTIONS, CHESHIRE_LESSON, judgeSignpost, SIGN_TEXT } from "../../lib/carbonContent";
 import { SCENE_CHESHIRE, SCENE_HALL } from "../../lib/constants";
 import { useGameStore } from "../../lib/state/store";
 import { createCheshireCat, type CheshireCat } from "../entities/cheshireCat";
@@ -21,13 +21,15 @@ import type { Zone, ZoneContext } from "./types";
 const CAT_ID = "cheshire-cat";
 const EXIT_ID = "exit-hall";
 const DUSK = 0x3b2a55;
+/** Both signposts share one colour so it can't hint at the answer. */
+const SIGN_BACKGROUND = "#f2ead8";
 const DEFAULT_CAT_POS: Vec3 = [0, 3.3, -6.6];
 
-function addSignpost(root: THREE.Group, x: number, z: number, text: string, isGood: boolean): void {
+function addSignpost(root: THREE.Group, x: number, z: number, text: string): void {
   const wood = flatMaterial(0x6b4a2b, { flatShading: true });
   const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.0, 0.12), wood);
   post.position.set(x, 0.9, z);
-  const sign = panel(text, { background: isGood ? "#dff3e0" : "#f6e0d4", widthMeters: 2.4 });
+  const sign = panel(text, { background: SIGN_BACKGROUND, widthMeters: 2.4 });
   sign.position.set(x, 2.0, z + 0.07);
   root.add(post, sign);
 }
@@ -58,8 +60,8 @@ export function createCheshireZone(): Zone {
       ground.rotation.x = -Math.PI / 2;
       ground.position.y = 0.003;
       ctx.root.add(ground);
-      addSignpost(ctx.root, -1.4, 1.5, SIGN_TEXT["sign-real"] ?? "", true);
-      addSignpost(ctx.root, 1.4, 1.5, SIGN_TEXT["sign-fake"] ?? "", false);
+      addSignpost(ctx.root, -1.4, 1.5, SIGN_TEXT["sign-real"] ?? "");
+      addSignpost(ctx.root, 1.4, 1.5, SIGN_TEXT["sign-fake"] ?? "");
       const exit = createDoor({ position: [0, 0, 10.6], rotY: Math.PI, width: 1.45, height: 2.4 });
       exit.setState("open");
       ctx.root.add(exit.group);

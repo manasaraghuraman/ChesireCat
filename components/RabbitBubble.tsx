@@ -16,9 +16,9 @@ import { useGameStore } from "@/lib/state/store";
 import { useWorldUi } from "./useWorldUi";
 
 const INTRO_LINES = [
-  "Oh my ears and whiskers — sorry about that pop-up! Clicking it was the very first mistake: never click something just because it shouts.",
-  "I'm the White Rabbit, your guide. See the tiny door at the end? The garden — the safe internet — needs the Golden Key.",
-  "The key is in four pieces. Each character behind these doors holds one. See through their trick to earn it.",
+  "Oh my ears and whiskers, I'm late, I'm late! I can't get to my meeting until the garden door is open. And every choice we make has a carbon footprint.",
+  "I'm the White Rabbit, your guide. See the tiny door at the end? The garden, a world with a smaller footprint, needs the Golden Key.",
+  "The key is in pieces. Each door hides a challenge that holds one. Make the low-carbon choice to earn it.",
   "Mouse to look, WASD to move, E to talk or open a door. Start with the Cheshire Cat's door. I'm late, I'm late!",
 ];
 const INTRO_LINE_SECONDS = 5.5;

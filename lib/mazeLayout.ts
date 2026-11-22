@@ -1,8 +1,8 @@
 /**
  * File: lib/mazeLayout.ts
  * Purpose: The maze as an ASCII grid and the builder that turns it into a level (walls with colliders,
- *          spawn, news boards, exit). public/levels/maze.level.json is generated from this and a test
- *          checks they match, so the file can't drift. R = real board, F = fake board, P = person to talk to, E = exit.
+ *          spawn, choice boards, exit). public/levels/maze.level.json is generated from this and a test
+ *          checks they match, so the file can't drift. R = low-carbon choice, F = high-carbon choice, P = person to talk to, E = exit.
  * Author: manasa
  * Date: 2026-11-22
  */
@@ -64,7 +64,7 @@ export function mazeLevelData() {
         kind: isExit ? "door" : isPerson ? "npc" : "sign",
         pos: [x, isPerson ? PERSON_Y : BOARD_Y, z],
         radius: BOARD_RADIUS,
-        label: isExit ? "the maze exit (collect 3 trustworthy sources first)" : isPerson ? "a person to talk to" : "a news board",
+        label: isExit ? "the maze exit (collect 3 low-carbon choices first)" : isPerson ? "a person to talk to" : "a choice board",
         enabled: !isExit,
       });
     }),
@@ -72,5 +72,5 @@ export function mazeLevelData() {
   const width = MAZE_GRID[0]!.length * CELL;
   const depth = MAZE_GRID.length * CELL;
   const geometry = [{ shape: "box", pos: [0, -0.5, 0], size: [width + 6, 1, depth + 6], tags: ["floor"] }, ...wallBoxes()];
-  return { id: "maze", name: "The News Maze", spawn: { pos: spawn, yaw: 0 }, geometry, interactables, npcs: [] };
+  return { id: "maze", name: "The Carbon Maze", spawn: { pos: spawn, yaw: 0 }, geometry, interactables, npcs: [] };
 }

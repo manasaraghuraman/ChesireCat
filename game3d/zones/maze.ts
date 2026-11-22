@@ -1,15 +1,15 @@
 /**
  * File: game3d/zones/maze.ts
- * Purpose: SCENE_MAZE, the News Maze (the one mini game): walk the maze and read the news boards.
- *          Walking up to a board (or pressing E on it) judges it: trustworthy sources are collected,
- *          fake ones explain why they are fake. Collect all three, reach the exit, and the Caterpillar key is yours. Rules live in
- *          lib/mediaLiteracy.ts.
+ * Purpose: SCENE_MAZE, the Carbon Maze: walk the maze and read the choice boards.
+ *          Walking up to a board (or pressing E on it) judges it: low-carbon choices are collected,
+ *          high-carbon choices explain why they cost carbon. Collect all three, reach the exit, and the Caterpillar key is yours. Rules live in
+ *          lib/carbonContent.ts.
  * Date: 2026-11-22
  */
 import * as THREE from "three";
 import { emit, on } from "../../game/bridge";
 import { SCENE_HALL } from "../../lib/constants";
-import { BOARDS, judgeBoard, MAZE_EXIT_ID, MAZE_KEY_LESSON, PEOPLE, personLine, REAL_BOARD_IDS } from "../../lib/mediaLiteracy";
+import { BOARDS, judgeBoard, MAZE_EXIT_ID, MAZE_KEY_LESSON, PEOPLE, personLine, REAL_BOARD_IDS } from "../../lib/carbonContent";
 import { useGameStore } from "../../lib/state/store";
 import { createPerson } from "../entities/person";
 import { panel } from "../labels";
@@ -95,7 +95,7 @@ export function createMazeZone(): Zone {
         );
       refresh();
       emit("hint", {
-        text: `Walk up to each news board to read it, and talk to the people you meet. Collect all ${REAL_BOARD_IDS.length} trustworthy sources, then reach the exit for your key. (Press H to go back to the Hall.)`,
+        text: `Walk up to each board to read it, and talk to the people you meet. Collect all ${REAL_BOARD_IDS.length} low-carbon choices (avoid the high-carbon ones), then reach the exit for your key. (Press H to go back to the Hall.)`,
         tone: "info",
       });
       judge = (id: string) => {

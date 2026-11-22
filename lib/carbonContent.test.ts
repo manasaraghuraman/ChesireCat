@@ -1,6 +1,6 @@
 /**
- * File: lib/mediaLiteracy.test.ts
- * Purpose: Tests for the signpost and news-board rules, and for the maze: every board and the exit
+ * File: lib/carbonContent.test.ts
+ * Purpose: Tests for the signpost, tip-board, clue and people rules, and for the maze: every board and the exit
  *          reachable from the start, the level file matching its layout, and ids matching content.
  * Author: manasa
  * Date: 2026-11-22
@@ -12,21 +12,20 @@ import { parseLevel } from "../game3d/level";
 import {
   BOARDS,
   CAT_INSTRUCTIONS,
-  CLUE_COUNT,
-  CLUES,
+  EVIDENCE,
   judgeBoard,
-  judgeClue,
+  judgeEvidence,
   judgeSignpost,
-  judgeVerdict,
   MAZE_EXIT_ID,
   PEOPLE,
   personLine,
+  RED_FLAG_COUNT,
   REAL_BOARD_IDS,
-} from "./mediaLiteracy";
+} from "./carbonContent";
 import { MAZE_GRID, mazeLevelData } from "./mazeLayout";
 
 describe("judgeSignpost", () => {
-  it("the real shop's signpost is correct and gives the key; the look-alike isn't", () => {
+  it("the lower-carbon signpost is correct and gives the key; the drive-alone signpost isn't", () => {
     expect(judgeSignpost("sign-real")?.isCorrect).toBe(true);
     expect(judgeSignpost("sign-fake")?.isCorrect).toBe(false);
   });
@@ -38,7 +37,7 @@ describe("judgeSignpost", () => {
 
   it("the Cat only instructs: it never says which signpost is right", () => {
     expect(CAT_INSTRUCTIONS).toMatch(/press E/i);
-    expect(CAT_INSTRUCTIONS).not.toMatch(/left|right|real|queensroyalshop|royal-crowns/i);
+    expect(CAT_INSTRUCTIONS).not.toMatch(/left|right|walk or cycle|bike|\bcycle\b|drive alone|0 kg/i);
   });
 });
 
@@ -119,26 +118,35 @@ describe("the maze", () => {
   });
 });
 
-describe("Clue Room", () => {
-  const all = new Set(Object.keys(CLUES));
+describe("Greenwash Check evidence cards", () => {
+  const redFlags = Object.keys(EVIDENCE).filter((id) => EVIDENCE[id]?.isRedFlag);
+  const decoys = Object.keys(EVIDENCE).filter((id) => !EVIDENCE[id]?.isRedFlag);
 
-  it("counts clues and never double-counts a repeat", () => {
-    expect(judgeClue("clue-1", new Set())).toMatchObject({ isNew: true, count: 1, isAllFound: false });
-    expect(judgeClue("clue-1", new Set(["clue-1"]))).toMatchObject({ isNew: false, count: 1 });
-    expect(judgeClue("clue-4", new Set(["clue-1", "clue-2", "clue-3"]))).toMatchObject({ count: CLUE_COUNT, isAllFound: true });
-    expect(judgeClue("nope", new Set())).toBeNull();
+  it("mixes exactly three red flags with decoys, so the player has to decide", () => {
+    expect(redFlags).toHaveLength(RED_FLAG_COUNT);
+    expect(RED_FLAG_COUNT).toBe(3);
+    expect(decoys.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("makes the player investigate before judging", () => {
-    expect(judgeVerdict("verdict-fake", 0)?.kind).toBe("early");
-    expect(judgeVerdict("verdict-fake", CLUE_COUNT - 1)?.kind).toBe("early");
-    expect(judgeVerdict("verdict-real", CLUE_COUNT - 1)?.kind).toBe("early");
+  it("counts red flags up and completes on the last one", () => {
+    expect(judgeEvidence(redFlags[0] ?? "", new Set())).toMatchObject({ kind: "red-flag", isNew: true, count: 1, isComplete: false });
+    expect(judgeEvidence(redFlags[2] ?? "", new Set([redFlags[0] ?? "", redFlags[1] ?? ""]))).toMatchObject({ count: 3, isComplete: true });
   });
 
-  it("FAKE is correct and REAL is wrong once every clue is found", () => {
-    expect(judgeVerdict("verdict-fake", all.size)?.kind).toBe("correct");
-    expect(judgeVerdict("verdict-real", all.size)?.kind).toBe("wrong");
-    expect(judgeVerdict("clue-1", all.size)).toBeNull();
+  it("never double-counts a repeated red flag", () => {
+    expect(judgeEvidence(redFlags[0] ?? "", new Set([redFlags[0] ?? ""]))).toMatchObject({ isNew: false, count: 1 });
+  });
+
+  it("a decoy never counts and never completes, even after every real flag was found", () => {
+    const all = new Set(redFlags);
+    for (const id of decoys) {
+      expect(judgeEvidence(id, all)).toMatchObject({ kind: "not-a-flag", isComplete: false, count: all.size });
+      expect(judgeEvidence(id, all)?.message).toMatch(/Not a red flag/);
+    }
+  });
+
+  it("returns null for unknown cards", () => {
+    expect(judgeEvidence("nope", new Set())).toBeNull();
   });
 });
 
