@@ -14,7 +14,7 @@ import { useGameStore } from "../../lib/state/store";
 import { createPerson, type PersonStyle } from "../entities/person";
 import { panel } from "../labels";
 import type { LevelInteractable } from "../level";
-import { nearbyIds, PROXIMITY_METERS } from "../proximity";
+import { nearbyIds, PROXIMITY_METERS, yawToward } from "../proximity";
 import { flatMaterial } from "../scenery";
 import type { Zone, ZoneContext } from "./types";
 
@@ -59,6 +59,7 @@ export function createMazeZone(): Zone {
   let eye: (() => readonly [number, number, number]) | null = null;
   let exitItem: LevelInteractable | null = null;
   let people: readonly LevelInteractable[] = [];
+  let figures: readonly THREE.Group[] = [];
   let insidePeople = new Set<string>();
   const spoken = new Map<string, number>();
   let talk: ((id: string) => void) | null = null;
@@ -80,11 +81,14 @@ export function createMazeZone(): Zone {
       people = base.filter((item) => isPerson(item.id));
       insidePeople = new Set();
       spoken.clear();
+      const made: THREE.Group[] = [];
       people.forEach((item, index) => {
         const style = PERSON_STYLES[index % PERSON_STYLES.length] ?? PERSON_STYLES[0]!;
         const person = createPerson(PEOPLE[item.id]?.name ?? "Person", style, item.pos, ctx.level?.spawn);
         ctx.root.add(person);
+        made.push(person);
       });
+      figures = made;
       talk = (id: string) => {
         const line = personLine(id, spoken.get(id) ?? 0);
         if (!line) return;
@@ -127,6 +131,8 @@ export function createMazeZone(): Zone {
       const near = new Set(boardsNear(boards, x, z, PROXIMITY_METERS));
       for (const id of near) if (!inside.has(id)) judge(id); // fires once each time you walk up to a board
       inside = near;
+      // Everyone turns to face the player, so you always see them from the front.
+      for (const figure of figures) figure.rotation.y = yawToward(figure.position.x, figure.position.z, x, z);
       const nearPeople = new Set(nearbyIds(people, x, z, PROXIMITY_METERS, isPerson));
       for (const id of nearPeople) if (!insidePeople.has(id)) talk?.(id); // they speak when you walk up
       insidePeople = nearPeople;
@@ -143,6 +149,7 @@ export function createMazeZone(): Zone {
       boards = [];
       exitItem = null;
       people = [];
+      figures = [];
       insidePeople = new Set();
       spoken.clear();
       talk = null;

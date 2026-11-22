@@ -6,6 +6,7 @@
  */
 import * as THREE from "three";
 import { panel } from "../labels";
+import { yawToward } from "../proximity";
 import { flatMaterial } from "../scenery";
 
 export interface PersonStyle {
@@ -65,6 +66,6 @@ export function createPerson(name: string, style: PersonStyle, at: readonly [num
   tag.position.y = headY + HEAD_RADIUS + 0.4;
   group.add(tag);
   group.position.set(at[0], 0, at[2]);
-  if (faceToward) group.rotation.y = Math.atan2(faceToward[0] - at[0], faceToward[2] - at[2]);
+  if (faceToward) group.rotation.y = yawToward(at[0], at[2], faceToward[0], faceToward[2]);
   return group;
 }

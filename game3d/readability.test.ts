@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { wrapLines } from "./labels";
 import { parseLevel } from "./level";
+import { yawToward } from "./proximity";
 import { boardsNear, PROXIMITY_METERS } from "./zones/maze";
 
 const measure = (line: string) => line.length * 10;
@@ -61,5 +62,25 @@ describe("maze boards", () => {
   it("starts the player further than the trigger distance from every board", () => {
     const [sx, , sz] = level.spawn;
     expect(boardsNear(boards, sx, sz, PROXIMITY_METERS)).toEqual([]);
+  });
+});
+
+describe("yawToward (people face the player)", () => {
+  it("is 0 when the target is straight ahead (+z, the way a person faces by default)", () => {
+    expect(yawToward(0, 0, 0, 5)).toBeCloseTo(0, 6);
+  });
+
+  it("turns a quarter turn for targets to the side and a half turn for behind", () => {
+    expect(yawToward(0, 0, 5, 0)).toBeCloseTo(Math.PI / 2, 6);
+    expect(yawToward(0, 0, -5, 0)).toBeCloseTo(-Math.PI / 2, 6);
+    expect(Math.abs(yawToward(0, 0, 0, -5))).toBeCloseTo(Math.PI, 6);
+  });
+
+  it("depends only on direction, not distance or position", () => {
+    expect(yawToward(10, 10, 12, 12)).toBeCloseTo(yawToward(0, 0, 100, 100), 6);
+  });
+
+  it("does not blow up when the player stands exactly on the person", () => {
+    expect(Number.isFinite(yawToward(3, 3, 3, 3))).toBe(true);
   });
 });

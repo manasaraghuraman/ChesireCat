@@ -9,6 +9,11 @@ import type { LevelInteractable } from "./level";
 /** Walk this close (metres, flat) to a board and it is read automatically. */
 export const PROXIMITY_METERS = 1.6;
 
+/** The turn (radians, around the vertical axis) that makes something at (fromX, fromZ) face (toX, toZ). */
+export function yawToward(fromX: number, fromZ: number, toX: number, toZ: number): number {
+  return Math.atan2(toX - fromX, toZ - fromZ);
+}
+
 export function nearbyIds(
   items: readonly LevelInteractable[],
   x: number,
