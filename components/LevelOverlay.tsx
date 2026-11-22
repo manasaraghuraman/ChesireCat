@@ -1,95 +1,52 @@
 /**
  * File: components/LevelOverlay.tsx
- * Purpose: Shows the active level's React UI (dialogue, feedback, lesson card)
- *          based on which Phaser scene is running.
+ * Purpose: Picks the React UI for whichever Phaser scene is running (hub, a trial, the Trial,
+ *          the ending) and keeps the server session alive for the page's lifetime.
  * Author: varenya
- * Date: 2026-11-21
+ * Date: 2026-11-21 (updated: routes every scene, owns the session lifecycle)
  */
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { emit, on } from "@/game/bridge";
-import { CHESHIRE_PUBLIC } from "@/lib/agents/personas/cheshire.public";
-import { SCENE_CHESHIRE } from "@/lib/constants";
-import type { RefereeVerdictType } from "@/lib/schemas";
-import { useGameStore, type VerdictOutcome } from "@/lib/state/store";
-import DialogueBox from "./DialogueBox";
-import LessonCard from "./LessonCard";
+import { useEffect, useState } from "react";
+import { on } from "@/game/bridge";
+import { endSessionOnLeave, ensureSession } from "@/lib/client/session";
+import {
+  SCENE_CATERPILLAR,
+  SCENE_CHESHIRE,
+  SCENE_GARDEN,
+  SCENE_HALL,
+  SCENE_HATTER,
+  SCENE_QUEEN,
+  SCENE_TRIAL,
+} from "@/lib/constants";
+import type { KeyPieceType } from "@/lib/schemas";
+import EndingCard from "./EndingCard";
+import HallPanel from "./HallPanel";
+import NpcLevelPanel from "./NpcLevelPanel";
+import TrialPanel from "./TrialPanel";
 
-interface Feedback {
-  readonly verdict: RefereeVerdictType;
-  readonly outcome: VerdictOutcome;
-}
-
-function describeSize({ sizeBefore, sizeAfter }: VerdictOutcome): string | null {
-  const change = sizeAfter - sizeBefore;
-  if (change > 0) return `You grew! (+${change} size)`;
-  if (change < 0) return `You shrank… (${change} size)`;
-  return null;
-}
+const NPC_SCENES: Readonly<Record<string, KeyPieceType>> = {
+  [SCENE_CATERPILLAR]: "caterpillar",
+  [SCENE_CHESHIRE]: "cheshire",
+  [SCENE_HATTER]: "hatter",
+  [SCENE_QUEEN]: "queen",
+};
 
 export default function LevelOverlay() {
   const [scene, setScene] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [lesson, setLesson] = useState<string | null>(null);
-  const applyVerdict = useGameStore((s) => s.applyVerdict);
 
-  useEffect(
-    () =>
-      on("scene-changed", (next) => {
-        setScene(next);
-        setFeedback(null);
-        setLesson(null);
-      }),
-    [],
-  );
+  useEffect(() => on("scene-changed", setScene), []);
+  useEffect(() => {
+    ensureSession().catch(() => undefined); // levels that need a session retry and show their own error
+    window.addEventListener("pagehide", endSessionOnLeave);
+    return () => window.removeEventListener("pagehide", endSessionOnLeave);
+  }, []);
 
-  const handleVerdict = useCallback(
-    (verdict: RefereeVerdictType) => {
-      const outcome = applyVerdict("cheshire", verdict);
-      setFeedback({ verdict, outcome });
-      if (outcome.keyAwarded && verdict.lesson) setLesson(verdict.lesson);
-    },
-    [applyVerdict],
-  );
-  const exitLevel = useCallback(() => emit("exit-level", null), []);
-  const closeLesson = useCallback(() => setLesson(null), []);
-
-  if (scene !== SCENE_CHESHIRE) return null;
-
-  const sizeText = feedback && describeSize(feedback.outcome);
-  return (
-    <div className="flex w-full max-w-[800px] flex-col gap-3">
-      <DialogueBox
-        levelId="cheshire"
-        npcName={CHESHIRE_PUBLIC.displayName}
-        openingLine={CHESHIRE_PUBLIC.openingLine}
-        onVerdict={handleVerdict}
-      />
-
-      <div aria-live="polite" className="flex flex-col gap-1 text-sm">
-        {sizeText && <p className="font-bold">{sizeText}</p>}
-        {feedback && feedback.verdict.redFlagsNamed.length > 0 && (
-          <p>Red flags you spotted: {feedback.verdict.redFlagsNamed.join(" · ")}</p>
-        )}
-        {feedback?.outcome.tooSmallForKey && (
-          <p className="text-amber-300">
-            You saw through the trick, but you&apos;re too small to reach the key! Spot more tricks to grow.
-          </p>
-        )}
-        {feedback?.verdict.oversharedRealInfo && (
-          <p className="rounded bg-sky-900/80 p-2">
-            <strong>Out of the game for a second:</strong> that looked like real personal information. In real life,
-            never share it with strangers online. Nothing you typed here was saved.
-          </p>
-        )}
-      </div>
-
-      <button onClick={exitLevel} className="self-start text-sm underline">
-        ← Back to the Hall of Doors
-      </button>
-
-      {lesson && <LessonCard piece="cheshire" lesson={lesson} onContinue={exitLevel} onStay={closeLesson} />}
-    </div>
-  );
+  if (scene === null) return null;
+  const piece = NPC_SCENES[scene];
+  if (piece) return <NpcLevelPanel key={scene} piece={piece} />;
+  if (scene === SCENE_HALL) return <HallPanel />;
+  if (scene === SCENE_TRIAL) return <TrialPanel />;
+  if (scene === SCENE_GARDEN) return <EndingCard />;
+  return null;
 }

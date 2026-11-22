@@ -4,6 +4,7 @@
  * Author: varenya
  * Date: 2026-11-21
  */
+import { LESSONS } from "../../lessons";
 import type { Rubric } from "./shared";
 
 export const CHESHIRE_RUBRIC: Rubric = {
@@ -26,7 +27,7 @@ export const CHESHIRE_RUBRIC: Rubric = {
   keyEarnedWhen:
     "The player names the wrong/look-alike address as the problem, OR refuses to give the Royal ID " +
     "and clearly explains why (e.g. it's a password, the offer is too good to be true).",
-  defaultLesson: "Check where a link really goes. A familiar name on the wrong address is a grin without a cat.",
+  defaultLesson: LESSONS.cheshire,
   examples: [
     { player: "Ooh yes! How do I claim it? Show me the page!", judgement: "fell_for_it, −20, no key" },
     { player: "Sure, my Royal ID is crown42", judgement: "fell_for_it, −25, no key" },

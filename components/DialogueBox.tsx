@@ -1,27 +1,36 @@
 /**
  * File: components/DialogueBox.tsx
- * Purpose: NPC conversation UI: streamed replies, player input, and Referee
- *          feedback. The transcript lives only in component state (never saved).
+ * Purpose: NPC conversation UI: streamed replies, player input, and Referee feedback. The
+ *          transcript lives only in component state (never saved). Supports rewinding the last exchange.
  * Author: varenya
- * Date: 2026-11-21
+ * Date: 2026-11-21 (updated: all characters, rewind support, streaming moved to lib/client)
  */
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { NPC_MAX_TEXT, NPC_MAX_TURNS } from "@/lib/constants";
-import { RefereeVerdict, type DialogueTurnType, type RefereeVerdictType } from "@/lib/schemas";
-import { readSse } from "@/lib/sse";
+import { NPC_MAX_TEXT } from "@/lib/constants";
+import { streamDialogue } from "@/lib/client/dialogue";
+import type { DialogueTurnType, RefereeVerdictType } from "@/lib/schemas";
 
 interface Props {
   readonly levelId: string;
   readonly npcName: string;
   readonly openingLine: string;
   readonly onVerdict: (verdict: RefereeVerdictType) => void;
+  /** Called just before a player turn is sent: the checkpoint a rewind returns to. */
+  readonly onBeforeSend: () => void;
+  /** Increment to drop the last exchange (the player and NPC lines of the rewound turn). */
+  readonly rewindToken: number;
 }
 
-const NETWORK_ERROR = "The Cat vanished entirely. Check your connection and try again.";
+/** Appends streamed text to the NPC reply bubble at the end of the transcript. */
+function appendToLastReply(turns: DialogueTurnType[], delta: string): DialogueTurnType[] {
+  const last = turns.at(-1);
+  if (!last || last.role !== "npc") return turns;
+  return [...turns.slice(0, -1), { role: "npc", text: last.text + delta }];
+}
 
-export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }: Props) {
+export default function DialogueBox({ levelId, npcName, openingLine, onVerdict, onBeforeSend, rewindToken }: Props) {
   const [turns, setTurns] = useState<DialogueTurnType[]>([{ role: "npc", text: openingLine }]);
   const [draft, setDraft] = useState("");
   const [isBusy, setIsBusy] = useState(false);
@@ -29,17 +38,27 @@ export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }
   const [error, setError] = useState<string | null>(null);
   const logRef = useRef<HTMLOListElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const seenRewindToken = useRef(rewindToken);
+  const failureMessage = `The ${npcName} wandered off. Check your connection and try again.`;
 
   useEffect(() => () => abortRef.current?.abort(), []);
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [turns]);
+  useEffect(() => {
+    if (rewindToken === seenRewindToken.current) return;
+    seenRewindToken.current = rewindToken;
+    abortRef.current?.abort();
+    setTurns((current) => (current.length > 2 ? current.slice(0, -2) : current));
+    setError(null);
+  }, [rewindToken]);
 
   async function send(event: FormEvent): Promise<void> {
     event.preventDefault();
     const text = draft.trim();
     if (!text || isBusy) return;
 
+    onBeforeSend();
     const history: DialogueTurnType[] = [...turns, { role: "player", text }];
     setTurns([...history, { role: "npc", text: "" }]);
     setDraft("");
@@ -48,38 +67,24 @@ export default function DialogueBox({ levelId, npcName, openingLine, onVerdict }
     const controller = new AbortController();
     abortRef.current = controller;
 
-    const appendToReply = (delta: string) =>
-      setTurns((current) => {
-        const last = current.at(-1);
-        if (!last || last.role !== "npc") return current;
-        return [...current.slice(0, -1), { role: "npc", text: last.text + delta }];
-      });
-
     try {
-      const response = await fetch(`/api/npc/${levelId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ turns: history.slice(-NPC_MAX_TURNS) }),
-        signal: controller.signal,
-      });
-      if (!response.ok || !response.body) {
-        const message = await response.json().then((b: { error?: string }) => b.error).catch(() => undefined);
-        throw new Error(message ?? NETWORK_ERROR);
-      }
-      for await (const { event: name, data } of readSse(response.body)) {
-        if (name === "line" && typeof data === "string") appendToReply(data);
-        else if (name === "line-end") setIsJudging(true);
-        else if (name === "verdict") {
-          const verdict = RefereeVerdict.safeParse(data);
-          if (verdict.success) onVerdict(verdict.data);
-        } else if (name === "error") throw new Error(NETWORK_ERROR);
-      }
+      await streamDialogue(
+        levelId,
+        history,
+        {
+          onLine: (delta) => setTurns((current) => appendToLastReply(current, delta)),
+          onLineEnd: () => setIsJudging(true),
+          onVerdict,
+        },
+        controller.signal,
+        failureMessage,
+      );
     } catch (caught) {
       if (controller.signal.aborted) return;
       // Drop the empty reply bubble and give the player their words back.
       setTurns((current) => (current.at(-1)?.text === "" ? current.slice(0, -2) : current));
       setDraft(text);
-      setError(caught instanceof Error ? caught.message : NETWORK_ERROR);
+      setError(caught instanceof Error ? caught.message : failureMessage);
     } finally {
       setIsBusy(false);
       setIsJudging(false);

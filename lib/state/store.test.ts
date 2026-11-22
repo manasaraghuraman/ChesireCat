@@ -69,4 +69,37 @@ describe("game store", () => {
     expect(useGameStore.getState().useRewind("cheshire")).toBe(false);
     expect(useGameStore.getState().rewindsLeft.cheshire).toBe(0);
   });
+
+  it("takes a snapshot and restores it, undoing size, key and lesson changes (rewind)", () => {
+    const store = useGameStore.getState();
+    const snapshot = store.takeSnapshot();
+    store.changeSize(-30);
+    store.awardKey("queen");
+    store.addLesson("a lesson");
+    store.restoreSnapshot(snapshot);
+    const after = useGameStore.getState();
+    expect(after.size).toBe(SIZE_START);
+    expect(after.keys).toEqual([]);
+    expect(after.lessons).toEqual([]);
+  });
+
+  it("restoring never leaves size outside the allowed range", () => {
+    useGameStore.getState().restoreSnapshot({ size: 500, keys: [], lessons: [] });
+    expect(useGameStore.getState().size).toBe(SIZE_MAX);
+  });
+
+  it("a snapshot is a copy: later changes don't mutate it", () => {
+    useGameStore.getState().awardKey("hatter");
+    const snapshot = useGameStore.getState().takeSnapshot();
+    useGameStore.getState().awardKey("queen");
+    expect(snapshot.keys).toEqual(["hatter"]);
+  });
+
+  it("tracks the Rabbit cure and the win flag, and reset clears both", () => {
+    useGameStore.getState().setRabbitCured(true);
+    useGameStore.getState().markWon();
+    expect(useGameStore.getState()).toMatchObject({ rabbitCured: true, hasWon: true });
+    useGameStore.getState().reset();
+    expect(useGameStore.getState()).toMatchObject({ rabbitCured: false, hasWon: false });
+  });
 });

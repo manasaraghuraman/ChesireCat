@@ -2,12 +2,14 @@
  * File: game/bridge.ts
  * Purpose: Minimal typed event bus between Phaser scenes and React overlays.
  * Author: manasa
- * Date: 2026-11-21
+ * Date: 2026-11-21 (updated: trial-won event)
  */
 export interface BridgeEvents {
   readonly "scene-changed": string;
   /** React asks the active level scene to return to the Hall of Doors. */
   readonly "exit-level": null;
+  /** React tells the Trial scene the fake evidence was exposed: play the finale. */
+  readonly "trial-won": null;
 }
 
 type Handler<K extends keyof BridgeEvents> = (payload: BridgeEvents[K]) => void;

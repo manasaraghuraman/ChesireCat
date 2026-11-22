@@ -2,7 +2,7 @@
  * File: lib/state/store.ts
  * Purpose: Zustand game store (size, keys, rewinds, progress) persisted to localStorage.
  * Author: manasa
- * Date: 2026-11-21
+ * Date: 2026-11-21 (updated: rewind snapshots, Rabbit cure, win flag)
  */
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -25,7 +25,18 @@ export interface VerdictOutcome {
   readonly tooSmallForKey: boolean;
 }
 
+/** The slice of game state a rewind restores (spec §3.3 state-JSON fallback). */
+export interface RewindSnapshot {
+  readonly size: number;
+  readonly keys: readonly KeyPieceType[];
+  readonly lessons: readonly string[];
+}
+
 interface Actions {
+  readonly takeSnapshot: () => RewindSnapshot;
+  readonly restoreSnapshot: (snapshot: RewindSnapshot) => void;
+  readonly setRabbitCured: (isCured: boolean) => void;
+  readonly markWon: () => void;
   readonly changeSize: (delta: number) => void;
   readonly awardKey: (piece: KeyPieceType) => void;
   readonly useRewind: (level: LevelIdType) => boolean;
@@ -46,12 +57,21 @@ export const createInitialState = (): GameStateType => ({
   rabbitCured: false,
   currentLevel: "fall",
   lessons: [],
+  hasWon: false,
 });
 
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       ...createInitialState(),
+      takeSnapshot: () => {
+        const { size, keys, lessons } = get();
+        return { size, keys: [...keys], lessons: [...lessons] };
+      },
+      restoreSnapshot: (snapshot) =>
+        set({ size: clampSize(snapshot.size), keys: [...snapshot.keys], lessons: [...snapshot.lessons] }),
+      setRabbitCured: (isCured) => set({ rabbitCured: isCured }),
+      markWon: () => set({ hasWon: true }),
       changeSize: (delta) => set((s) => ({ size: clampSize(s.size + delta) })),
       awardKey: (piece) =>
         set((s) => (s.keys.includes(piece) ? s : { keys: [...s.keys, piece] })),

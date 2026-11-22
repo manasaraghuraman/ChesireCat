@@ -12,6 +12,7 @@
   "dependencies": {
     "@ai-sdk/groq": "4.0.77",
     "@solarisdk/browser": "0.5.5",
+    "@solarisdk/desktop": "0.2.12",
     "@solarisdk/sandbox": "0.4.15",
     "ai": "7.0.164",
     "next": "16.4.6",

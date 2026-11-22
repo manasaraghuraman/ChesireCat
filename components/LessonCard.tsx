@@ -2,7 +2,7 @@
  * File: components/LessonCard.tsx
  * Purpose: Shown when a key piece is earned: names the lesson in one line.
  * Author: varenya
- * Date: 2026-11-21
+ * Date: 2026-11-21 (updated: optional Solari replay link, guide lesson)
  */
 "use client";
 
@@ -11,11 +11,15 @@ import { useEffect, useRef } from "react";
 interface Props {
   readonly piece: string;
   readonly lesson: string;
+  /** Solari replay of the moment the Rabbit was fooled (https only, validated server-side). */
+  readonly replayUrl?: string | null;
+  /** Extra lesson line, e.g. the guide lesson after curing the Rabbit. */
+  readonly extraLesson?: string;
   readonly onContinue: () => void;
   readonly onStay: () => void;
 }
 
-export default function LessonCard({ piece, lesson, onContinue, onStay }: Props) {
+export default function LessonCard({ piece, lesson, replayUrl, extraLesson, onContinue, onStay }: Props) {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -42,6 +46,14 @@ export default function LessonCard({ piece, lesson, onContinue, onStay }: Props)
           You earned the {piece} key piece!
         </h2>
         <p className="mt-4 text-lg">{lesson}</p>
+        {extraLesson && <p className="mt-2">{extraLesson}</p>}
+        {replayUrl && (
+          <p className="mt-3 text-sm">
+            <a href={replayUrl} target="_blank" rel="noopener noreferrer" className="underline">
+              Watch the moment the Rabbit was fooled (opens a recording)
+            </a>
+          </p>
+        )}
         <div className="mt-6 flex justify-center gap-3">
           <button
             ref={buttonRef}

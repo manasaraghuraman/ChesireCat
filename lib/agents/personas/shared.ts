@@ -2,7 +2,7 @@
  * File: lib/agents/personas/shared.ts
  * Purpose: Rules prepended to every NPC persona (spec §7.1) and the persona types.
  * Author: varenya
- * Date: 2026-11-21
+ * Date: 2026-11-21 (updated: optional per-persona format note)
  */
 import type { KeyPieceType } from "../../schemas";
 
@@ -30,6 +30,8 @@ export interface Persona {
   readonly worldFacts: string;
   /** In-character lines used when the model refuses or fails. */
   readonly fallbackLines: readonly string[];
+  /** Overrides the shared two-sentence format for characters who must say more (e.g. the Hatter). */
+  readonly formatNote?: string;
 }
 
 /** What the Referee judges against, per level (spec §7.3). */
@@ -54,5 +56,6 @@ export function buildSystemPrompt(persona: Persona): string {
     `HIDDEN GOAL: ${persona.hiddenGoal}`,
     `STYLE: ${persona.style}`,
     `WORLD: ${persona.worldFacts}`,
+    ...(persona.formatNote ? [`FORMAT OVERRIDE (applies to you instead of the format above): ${persona.formatNote}`] : []),
   ].join("\n");
 }
