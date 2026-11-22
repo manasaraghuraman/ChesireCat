@@ -27,8 +27,33 @@ function cylinder(
   return mesh;
 }
 
-export function fixture(type: string, big: boolean) {
+/** How a small fixture sits against its wall: model yaw and distance from the task point to the wall face. */
+export type Mount = { facing: number; gap: number };
+/** Approximate depth of each small fixture so it sits flush against the wall. */
+const depth: Record<string, number> = {
+  charger: 0.43,
+  standby: 0.43,
+  car_keys: 0.43,
+  drip: 0.43,
+  laundry: 0.5,
+  stove: 0.62,
+  tv: 0.42,
+  faucet: 0.52,
+  computer: 0.58,
+  fan: 0.4,
+  space_heater: 0.28,
+};
+const glowing = (color: number, intensity: number) =>
+  new T.MeshStandardMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: intensity,
+    roughness: 0.4,
+  });
+
+export function fixture(type: string, big: boolean, mount?: Mount) {
   const model = new T.Group();
+  let animate: ((seconds: number) => void) | undefined;
   const indicator = new T.MeshStandardMaterial({
     color: 0xffd092,
     emissive: 0xffad52,
@@ -36,7 +61,14 @@ export function fixture(type: string, big: boolean) {
     roughness: 0.32,
   });
   const floor = new T.Group();
-  floor.position.set(big ? 1.55 : 0.5, big ? 0 : -1, 0);
+  if (mount && !big) {
+    model.rotation.y = mount.facing;
+    floor.position.set(
+      0,
+      -1,
+      type === "light" ? -mount.gap : -mount.gap + (depth[type] ?? 0.45) / 2,
+    );
+  } else floor.position.set(big ? 1.55 : 0.5, big ? 0 : -1, 0);
   model.add(floor);
   let update: ((done: boolean) => void) | undefined;
   let complete: boolean | undefined;
@@ -52,39 +84,29 @@ export function fixture(type: string, big: boolean) {
   };
 
   if (type === "light") {
-    cylinder(floor, brass, 0.23, 0.06, [0, 0.03, 0]);
-    cylinder(floor, brass, 0.025, 1.28, [0, 0.68, 0]);
-    cylinder(floor, iron, 0.045, 0.12, [0, 1.32, 0]);
-    // Turned glass envelope, neck and threaded base form a recognizable bulb.
-    const bulb = new T.Mesh(
-      new T.LatheGeometry(
-        [
-          [0, 0],
-          [0.041, 0],
-          [0.048, 0.053],
-          [0.077, 0.088],
-          [0.105, 0.126],
-          [0.108, 0.178],
-          [0.091, 0.225],
-          [0.058, 0.253],
-          [0, 0.267],
-        ].map(([r, y]) => new T.Vector2(r, y)),
-        32,
-      ),
-      indicator,
+    // A wall switch beside the doorway controls a pendant lamp out in the room.
+    box(floor, enamel, [0.1, 0.15, 0.014], [0, 1.25, 0.007]);
+    const toggle = box(floor, brass, [0.026, 0.05, 0.03], [0, 1.25, 0.022]);
+    const lamp = new T.Group();
+    lamp.position.set(0, 0, 1.7);
+    floor.add(lamp);
+    cylinder(lamp, iron, 0.008, 3.1, [0, 4.85, 0]);
+    const shade = new T.Mesh(
+      new T.CylinderGeometry(0.09, 0.34, 0.26, 28, 1, true),
+      brass,
     );
-    bulb.position.y = 1.36;
-    floor.add(bulb);
-    const glow = new T.PointLight(0xffc28a, 6, 4);
-    glow.position.y = 1.54;
-    floor.add(glow);
+    shade.position.y = 3.2;
+    lamp.add(shade);
+    const bulb = new T.Mesh(new T.SphereGeometry(0.085, 16, 12), indicator);
+    bulb.position.y = 3.06;
+    lamp.add(bulb);
+    const glow = new T.PointLight(0xffc28a, 9, 7);
+    glow.position.y = 2.95;
+    lamp.add(glow);
     update = (done) => {
-      glow.intensity = done ? 0 : 6;
+      glow.intensity = done ? 0 : 9;
+      toggle.rotation.x = done ? 0.5 : -0.5;
     };
-    for (const y of [1.29, 1.31, 1.33, 1.35])
-      cylinder(floor, brass, 0.048, 0.009, [0, y, 0]);
-    box(floor, iron, [0.14, 0.21, 0.08], [0, 1.03, 0.04]);
-    box(floor, enamel, [0.053, 0.072, 0.036], [0, 1.04, 0.09]);
   } else if (type === "charger" || type === "standby" || type === "car_keys") {
     tabletop();
     if (type === "charger") {
@@ -199,9 +221,181 @@ export function fixture(type: string, big: boolean) {
         for (const z of [-0.14, 0.14])
           cylinder(floor, iron, 0.11, 0.025, [x, 1.09, z]);
     }
+  } else if (type === "stove") {
+    cabinet(0.76, 0.88, 0.62);
+    box(floor, iron, [0.78, 0.05, 0.64], [0, 0.905, 0]);
+    box(floor, steel, [0.76, 0.12, 0.04], [0, 0.8, 0.32]);
+    const coil = glowing(0xff5a1f, 2.6);
+    for (const [x, z, on] of [
+      [-0.18, -0.15, true],
+      [0.18, -0.15, false],
+      [-0.18, 0.15, false],
+      [0.18, 0.15, true],
+    ] as const) {
+      const ring = new T.Mesh(
+        new T.TorusGeometry(0.1, 0.018, 8, 28),
+        on ? coil : iron,
+      );
+      ring.rotation.x = Math.PI / 2;
+      ring.position.set(x, 0.935, z);
+      floor.add(ring);
+      cylinder(floor, iron, 0.022, 0.03, [x, 0.8, 0.345], true);
+    }
+    cylinder(floor, steel, 0.13, 0.17, [0.18, 1.02, 0.15]);
+    const steam = new T.Group();
+    floor.add(steam);
+    const vapour = new T.MeshStandardMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.35,
+      depthWrite: false,
+    });
+    for (let i = 0; i < 4; i++) {
+      const puff = new T.Mesh(new T.SphereGeometry(0.07, 10, 8), vapour);
+      puff.userData.phase = i / 4;
+      steam.add(puff);
+    }
+    let on = true;
+    update = (done) => {
+      on = !done;
+      coil.emissiveIntensity = done ? 0 : 2.6;
+      coil.color.setHex(done ? 0x3a3a3a : 0xff5a1f);
+      steam.visible = !done;
+    };
+    animate = (t) => {
+      if (!on) return;
+      coil.emissiveIntensity = 2.3 + 0.4 * Math.sin(t * 5);
+      for (const puff of steam.children) {
+        const k = (t * 0.6 + (puff.userData.phase as number)) % 1;
+        puff.position.set(0.18 + 0.04 * Math.sin(k * 9), 1.12 + k * 0.6, 0.15);
+        puff.scale.setScalar(0.6 + k * 1.4);
+      }
+    };
+  } else if (type === "tv") {
+    box(floor, oak, [1.05, 0.5, 0.42], [0, 0.25, 0]);
+    box(floor, iron, [0.3, 0.05, 0.2], [0, 0.525, -0.05]);
+    box(floor, iron, [0.06, 0.16, 0.05], [0, 0.6, -0.05]);
+    box(floor, iron, [0.98, 0.6, 0.06], [0, 0.98, -0.05]);
+    const screen = glowing(0x6fb7ff, 1.6);
+    box(floor, screen, [0.9, 0.52, 0.01], [0, 0.98, -0.017]);
+    let on = true;
+    update = (done) => {
+      on = !done;
+      screen.emissiveIntensity = done ? 0 : 1.6;
+      screen.color.setHex(done ? 0x141a1f : 0x6fb7ff);
+    };
+    animate = (t) => {
+      if (!on) return;
+      const hue = 0.55 + 0.08 * Math.sin(t * 1.7) + 0.04 * Math.sin(t * 7.3);
+      screen.emissive.setHSL(hue % 1, 0.7, 0.55);
+      screen.emissiveIntensity = 1.3 + 0.35 * Math.abs(Math.sin(t * 3.1));
+    };
+  } else if (type === "faucet") {
+    cabinet(0.72, 0.86, 0.52, oak);
+    box(floor, enamel, [0.76, 0.06, 0.56], [0, 0.89, 0]);
+    box(floor, steel, [0.46, 0.02, 0.32], [0, 0.915, 0.03]);
+    cylinder(floor, steel, 0.025, 0.3, [0, 1.06, -0.19]);
+    box(floor, steel, [0.04, 0.04, 0.18], [0, 1.2, -0.11]);
+    for (const x of [-0.11, 0.11])
+      cylinder(floor, brass, 0.035, 0.05, [x, 0.95, -0.2]);
+    const water = new T.Mesh(
+      new T.CylinderGeometry(0.014, 0.02, 0.27, 10),
+      new T.MeshStandardMaterial({
+        color: 0x9fd4ff,
+        emissive: 0x3c84c4,
+        emissiveIntensity: 0.6,
+        transparent: true,
+        opacity: 0.75,
+      }),
+    );
+    water.position.set(0, 1.05, -0.03);
+    floor.add(water);
+    update = (done) => {
+      water.visible = !done;
+    };
+    animate = (t) => {
+      water.scale.x = water.scale.z = 1 + 0.15 * Math.sin(t * 23);
+    };
+  } else if (type === "computer") {
+    box(floor, oak, [1.0, 0.05, 0.56], [0, 0.75, 0]);
+    for (const x of [-0.45, 0.45])
+      box(floor, oak, [0.06, 0.73, 0.5], [x, 0.365, 0]);
+    box(floor, iron, [0.22, 0.03, 0.16], [0, 0.79, -0.12]);
+    box(floor, iron, [0.05, 0.2, 0.04], [0, 0.9, -0.14]);
+    box(floor, iron, [0.62, 0.4, 0.04], [0, 1.18, -0.12]);
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 80;
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#1d3b5c";
+    ctx.fillRect(0, 0, 128, 80);
+    for (let i = 0; i < 9; i++) {
+      ctx.fillStyle = ["#8fd3ff", "#ffd38f", "#a8f0b0"][i % 3];
+      ctx.fillRect(8 + (i % 2) * 10, 6 + i * 8, 40 + ((i * 37) % 60), 3);
+    }
+    const map = new T.CanvasTexture(canvas);
+    map.colorSpace = T.SRGBColorSpace;
+    const screen = new T.MeshStandardMaterial({
+      map,
+      emissive: 0xffffff,
+      emissiveMap: map,
+      emissiveIntensity: 1.2,
+    });
+    box(floor, screen, [0.56, 0.34, 0.01], [0, 1.18, -0.097]);
+    box(floor, iron, [0.42, 0.02, 0.14], [0, 0.785, 0.1]);
+    led(0.25, 1.0, -0.1);
+    update = (done) => {
+      screen.emissiveIntensity = done ? 0 : 1.2;
+      screen.color.setHex(done ? 0x111111 : 0xffffff);
+    };
+  } else if (type === "fan") {
+    cylinder(floor, iron, 0.17, 0.04, [0, 0.02, 0]);
+    cylinder(floor, steel, 0.02, 1.05, [0, 0.55, 0]);
+    box(floor, iron, [0.12, 0.12, 0.16], [0, 1.1, -0.02]);
+    const head = new T.Group();
+    head.position.set(0, 1.1, 0.1);
+    floor.add(head);
+    const cage = new T.Mesh(new T.TorusGeometry(0.24, 0.008, 6, 36), steel);
+    head.add(cage);
+    const blades = new T.Group();
+    head.add(blades);
+    for (let i = 0; i < 3; i++) {
+      const blade = box(blades, enamel, [0.07, 0.2, 0.01], [0, 0.11, 0]);
+      const arm = new T.Group();
+      arm.rotation.z = (i * 2 * Math.PI) / 3;
+      blades.remove(blade);
+      arm.add(blade);
+      blades.add(arm);
+    }
+    let on = true;
+    update = (done) => {
+      on = !done;
+    };
+    animate = (t) => {
+      if (on) blades.rotation.z = t * 18;
+    };
+  } else if (type === "space_heater") {
+    box(floor, iron, [0.5, 0.6, 0.26], [0, 0.33, 0]);
+    box(floor, iron, [0.56, 0.04, 0.32], [0, 0.02, 0]);
+    const coil = glowing(0xff6a2b, 2.4);
+    for (let i = 0; i < 4; i++)
+      box(floor, coil, [0.38, 0.03, 0.02], [0, 0.18 + i * 0.1, 0.13]);
+    for (let i = 0; i < 5; i++)
+      box(floor, steel, [0.012, 0.42, 0.02], [-0.18 + i * 0.09, 0.33, 0.145]);
+    led(0.19, 0.58, 0.131);
+    let on = true;
+    update = (done) => {
+      on = !done;
+      coil.emissiveIntensity = done ? 0 : 2.4;
+      coil.color.setHex(done ? 0x3a3a3a : 0xff6a2b);
+    };
+    animate = (t) => {
+      if (on) coil.emissiveIntensity = 2.1 + 0.4 * Math.sin(t * 2.2);
+    };
   }
   return {
     model,
+    animate,
     setComplete(done: boolean) {
       if (complete === done) return;
       complete = done;

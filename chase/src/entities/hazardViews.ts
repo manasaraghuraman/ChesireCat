@@ -65,11 +65,13 @@ function makeRabbit() {
     0.27,
   );
   watch.rotation.x = Math.PI / 2;
-  const call = label("I’m late!");
-  call.scale.set(1.7, 0.38, 1);
+  const call = label("I’m late!", 0.42);
   call.position.y = 2;
   root.add(call);
-  return { root, body, paw, call };
+  const prank = label("Hee hee! Left it on!", 0.38);
+  prank.position.y = 2;
+  root.add(prank);
+  return { root, body, paw, call, prank };
 }
 const suits = ["♥", "♠", "♦", "♣"];
 const cardFaces = new Map<string, T.MeshStandardMaterial>();
@@ -184,6 +186,14 @@ export function spawnHazards(scene: T.Scene, run: LevelRun) {
       ? 0.62 + 0.06 * Math.cos(sec * 8)
       : 0.66;
     rabbit.call.visible = sec < HAZARDS.callSeconds;
+    const prank = actors.prank;
+    rabbit.prank.visible = !!prank;
+    // Pop in and out of a prank like a Wonderland conjuring trick.
+    const age = prank ? sec - prank.start : 1;
+    const left = prank ? HAZARDS.mischiefVisit - age : 1;
+    rabbit.root.scale.setScalar(
+      Math.min(1, Math.max(0.05, Math.min(age, left) / 0.2)),
+    );
     cards.forEach((card, i) => {
       const s = actors.soldiers[i];
       card.root.position.lerpVectors(s.previous, s.pos, alpha);

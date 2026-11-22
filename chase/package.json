@@ -10,7 +10,8 @@
     "test": "vitest run",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "assets": "node scripts/assets.mjs"
+    "assets": "node scripts/assets.mjs",
+    "levels": "node scripts/levels.mjs && prettier --write public/levels"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.21.0",

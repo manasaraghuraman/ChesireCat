@@ -9,8 +9,17 @@ export const defaults = {
   shake: true,
 };
 export type Settings = typeof defaults;
+/** Chapter 1 cottages were redesigned, so their times and ghosts start fresh. */
+const redesigned = new Set(["c1_l1", "c1_l2", "c1_l3", "c1_l4", "c1_l5"]);
 const storageKey = (key: string) =>
-  (key === "c1_l1" ? "rabbit-hole.footprint." : "rabbit-hole.v1.") + key;
+  (redesigned.has(key) ? "rabbit-hole.cottage2." : "rabbit-hole.v1.") + key;
+/** Earlier saves for a level, kept only so a found glove stays unlocked. */
+const legacyKeys = (id: string) =>
+  id === "c1_l1"
+    ? ["rabbit-hole.footprint.c1_l1", "rabbit-hole.chapter1.c1_l1"]
+    : redesigned.has(id)
+      ? ["rabbit-hole.v1." + id]
+      : [];
 const bounded = (v: unknown, min: number, max: number, fallback: number) =>
   typeof v === "number" && Number.isFinite(v)
     ? Math.max(min, Math.min(v, max))
@@ -87,20 +96,18 @@ export class LocalSave {
     return {
       best,
       medal: best === null ? null : medal(id, best),
-      glove:
-        raw.glove === true || (id === "c1_l1" && this.legacyLightsOutGlove()),
+      glove: raw.glove === true || this.legacyGlove(id),
     };
   }
-  private legacyLightsOutGlove() {
+  private legacyGlove(id: string) {
     if (!this.persistent) return false;
-    try {
-      return (
-        JSON.parse(this.storage().getItem("rabbit-hole.chapter1.c1_l1") ?? "{}")
-          ?.glove === true
-      );
-    } catch {
-      return false;
-    }
+    return legacyKeys(id).some((key) => {
+      try {
+        return JSON.parse(this.storage().getItem(key) ?? "{}")?.glove === true;
+      } catch {
+        return false;
+      }
+    });
   }
   ghost(id: LevelId) {
     const raw = this.read(id),

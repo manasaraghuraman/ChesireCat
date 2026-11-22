@@ -2,7 +2,7 @@ import { Hazards } from "../entities/hazards";
 import type { PowerId } from "../config/powers";
 import R from "@dimforge/rapier3d-compat";
 import rules from "../config/leaks.json";
-import { footprintActions, footprintChallenge } from "../config/footprint";
+import { footprintActions } from "../config/footprint";
 import { DT } from "../core/loop";
 import type { LevelData } from "./jsonLevel";
 import type { TrainingWorld } from "../physics/world";
@@ -22,6 +22,8 @@ export class LevelRun {
   readonly usedPowers: PowerId[] = [];
   readonly splits: number[] = [];
   gloveFound = false;
+  /** The most recent task an actor switched back on. */
+  relit: { index: number; tick: number } | null = null;
   private readonly glove: R.Collider | null;
   private readonly hole: R.Collider;
   constructor(
@@ -67,6 +69,7 @@ export class LevelRun {
     this.progress.fill(0);
     this.splits.length = 0;
     this.usedPowers.length = 0;
+    this.relit = null;
   }
   get hunt() {
     return Boolean(this.level.partitions?.length);
@@ -82,7 +85,7 @@ export class LevelRun {
     ).length;
   }
   get challenge() {
-    return this.level.footprintChallenge ? footprintChallenge : null;
+    return this.level.footprint ?? null;
   }
   actionAt(index: number) {
     return this.challenge
@@ -97,12 +100,15 @@ export class LevelRun {
   }
   get footprintPoints() {
     return (
-      footprintChallenge.start -
+      (this.level.footprint?.start ?? 0) -
       this.completedActions.reduce((sum, action) => sum + action.points, 0)
     );
   }
   get pointsToOpen() {
-    return Math.max(0, this.footprintPoints - footprintChallenge.target);
+    return Math.max(
+      0,
+      this.footprintPoints - (this.level.footprint?.target ?? 0),
+    );
   }
   get exitOpen() {
     return this.challenge ? this.pointsToOpen === 0 : this.remaining === 0;
@@ -167,7 +173,20 @@ export class LevelRun {
         }
       }
     }
-    this.hazards.tick(this.worldTicks, this.physics, this.progress);
+    const before = this.progress.slice();
+    this.hazards.tick(
+      this.worldTicks,
+      this.physics,
+      this.progress,
+      this.splits,
+      !this.exitOpen,
+    );
+    // Soldiers and the Rabbit can switch finished tasks back on.
+    for (const [i, value] of before.entries())
+      if (value === ringTicks && this.progress[i] < ringTicks) {
+        delete this.splits[i];
+        this.relit = { index: i, tick: this.ticks };
+      }
     this.finished =
       this.exitOpen && this.physics.world.intersectionPair(player, this.hole);
   }

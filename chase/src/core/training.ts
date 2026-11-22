@@ -47,20 +47,72 @@ export async function createTraining(
   const ghost = new GhostPlayer(scene),
     recorder = new Recorder();
   let track: Track | null = null;
-  scene.background = new T.Color(0xa4c8bf);
-  scene.fog = new T.FogExp2(0xa4c8bf, 0.019);
-  scene.add(new T.HemisphereLight(0xfff6d8, 0x668080, 2));
-  const sun = new T.DirectionalLight(0xffe8c4, 2);
+  // Wonderland sky: a soft dome from teal overhead to warm cream at the horizon.
+  const horizon = 0xf3e3c3;
+  scene.background = new T.Color(horizon);
+  scene.fog = new T.FogExp2(horizon, 0.011);
+  const sky = new T.Mesh(
+    new T.SphereGeometry(120, 32, 16),
+    new T.ShaderMaterial({
+      side: T.BackSide,
+      depthWrite: false,
+      fog: false,
+      uniforms: {
+        top: { value: new T.Color(0x6fb3c4) },
+        bottom: { value: new T.Color(horizon) },
+      },
+      vertexShader:
+        "varying float h; void main() { h = normalize(position).y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+      fragmentShader:
+        "uniform vec3 top; uniform vec3 bottom; varying float h; void main() { gl_FragColor = vec4(mix(bottom, top, smoothstep(-0.05, 0.55, h)), 1.0); }",
+    }),
+  );
+  sky.frustumCulled = false;
+  sky.renderOrder = -1;
+  scene.add(sky);
+  scene.add(new T.HemisphereLight(0xfff6d8, 0x6f8580, 1.35));
+  const sun = new T.DirectionalLight(0xffe8c4, 2.1);
   sun.position.set(-5, 14, 8);
-  scene.add(sun);
-  const pixels = new Uint8Array([
-    236, 226, 201, 255, 189, 207, 194, 255, 189, 207, 194, 255, 236, 226, 201,
-    255,
-  ]);
-  const tiles = new T.DataTexture(pixels, 2, 2);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0004;
+  sun.shadow.normalBias = 0.03;
+  const reach = 22;
+  Object.assign(sun.shadow.camera, {
+    left: -reach,
+    right: reach,
+    top: reach,
+    bottom: -reach,
+    near: 1,
+    far: 60,
+  });
+  scene.add(sun, sun.target);
+  webgl.shadowMap.enabled = true;
+  webgl.shadowMap.type = T.PCFSoftShadowMap;
+  const sunOffset = sun.position.clone();
+  // Checkered floor tiles with a thin grout line, crisp at any distance.
+  const tileCanvas = document.createElement("canvas");
+  tileCanvas.width = tileCanvas.height = 256;
+  const tc = tileCanvas.getContext("2d")!;
+  for (let y = 0; y < 2; y++)
+    for (let x = 0; x < 2; x++) {
+      tc.fillStyle = (x + y) % 2 ? "#c7b089" : "#e4d9c0";
+      tc.fillRect(x * 128, y * 128, 128, 128);
+    }
+  tc.strokeStyle = "rgba(120, 100, 70, 0.25)";
+  tc.lineWidth = 3;
+  for (const v of [0, 128, 256]) {
+    tc.beginPath();
+    tc.moveTo(v, 0);
+    tc.lineTo(v, 256);
+    tc.moveTo(0, v);
+    tc.lineTo(256, v);
+    tc.stroke();
+  }
+  const tiles = new T.CanvasTexture(tileCanvas);
   tiles.colorSpace = T.SRGBColorSpace;
   tiles.wrapS = tiles.wrapT = T.RepeatWrapping;
-  tiles.needsUpdate = true;
+  tiles.anisotropy = webgl.capabilities.getMaxAnisotropy();
   const cottageFloor = floorboards();
   const beams = surface(0x69503a);
   const partitionPlaster = surface(0xc5b493);
@@ -83,6 +135,8 @@ export async function createTraining(
             opacity: b.obstacle === "phaseable" ? 0.55 : 1,
           }),
         );
+      mesh.castShadow = b.obstacle !== "phaseable";
+      mesh.receiveShadow = true;
       if (cottage) {
         mesh.material.dispose();
         mesh.material = b.obstacle
@@ -94,7 +148,10 @@ export async function createTraining(
               : beams;
       }
       if (!b.obstacle && !b.wallrun && b.size[1] < b.size[0]) {
-        if (!cottage) mesh.material.map = tiles;
+        if (!cottage) {
+          mesh.material.map = tiles;
+          mesh.material.color.setHex(0xffffff);
+        }
         const uv = geo.attributes.uv,
           positions = geo.attributes.position;
         for (let i = 0; i < uv.count; i++)
@@ -152,6 +209,11 @@ export async function createTraining(
       },
     };
   });
+  for (const room of rooms)
+    room.group.traverse((o) => {
+      if (o instanceof T.Mesh && o.material instanceof T.MeshStandardMaterial)
+        o.castShadow = !o.material.transparent;
+    });
   let current: (typeof rooms)[number] | undefined;
   // Lane markings establish distance and make speed visible on the flat floor.
   const mark = new T.MeshBasicMaterial({ color: 0x477c72 });
@@ -463,6 +525,8 @@ export async function createTraining(
     camera.fov =
       m.fov + (physics.power.id === "eat_me" ? powers.eat_me.fov : 0);
     camera.updateProjectionMatrix();
+    sun.target.position.copy(camera.position);
+    sun.position.copy(camera.position).add(sunOffset);
     if (debug.visible) {
       const { vertices, colors } = physics.world.debugRender();
       debug.geometry.dispose();

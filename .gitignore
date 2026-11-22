@@ -8,3 +8,5 @@ next-env.d.ts
 # vendored chase game: own deps, and its build output (run `npm run build:chase`)
 chase/node_modules
 public/chase
+.vercel
+.env*

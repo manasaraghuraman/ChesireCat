@@ -13,7 +13,6 @@ import {
 } from "../config/carbon";
 import { Commentary } from "./Commentary";
 import { Leaderboard } from "./Leaderboard";
-import { online, chooseName, displayName } from "../net/online";
 import { useState } from "preact/hooks";
 import { courses, medal } from "../config/courses";
 import type { LocalSave, Settings as Values } from "../save/localSave";
@@ -56,37 +55,6 @@ export function App({
   const [page, setPage] = useState<"menu" | "levels" | "settings" | "tips">(
     "menu",
   );
-  const [name, setName] = useState(displayName()),
-    [skipped, setSkipped] = useState(false);
-  if (mode === "title" && online && !displayName() && !skipped)
-    return (
-      <form
-        class="panel"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (name.trim()) chooseName(name);
-          setSkipped(true);
-        }}
-      >
-        <h2>Leaderboard name</h2>
-        <label>
-          Display name{" "}
-          <input
-            autoComplete="nickname"
-            required
-            maxLength={24}
-            value={name}
-            onInput={(e) => setName(e.currentTarget.value)}
-          />
-        </label>
-        <div class="actions">
-          <button>Save name</button>
-          <button type="button" onClick={() => setSkipped(true)}>
-            Play locally
-          </button>
-        </div>
-      </form>
-    );
   const embeddedLevel = isEmbedded ? requestedLevel() : null;
   if (embeddedLevel && mode === "title")
     return (
@@ -109,6 +77,13 @@ export function App({
             <strong>{run.level.name}</strong>
             {run.gloveFound && <span>Glove found</span>}
             {run.hazards.inSmog && <span>Smog · 60% speed</span>}
+            {run.relit && (run.ticks - run.relit.tick) * DT < 4 && (
+              <span class="prank">
+                🐇 The Rabbit switched the{" "}
+                {run.level.leaks[run.relit.index].type.replaceAll("_", " ")}{" "}
+                back on!
+              </span>
+            )}
             <b>{time(run.ticks * DT)}</b>
             {run.challenge ? (
               <>
@@ -288,11 +263,13 @@ export function App({
           </p>
         </section>
         <Commentary run={run} medal={medal(course.id, run.finalTime)} />
-        <Leaderboard
-          id={course.id}
-          afterFinish
-          race={() => start(course.course)}
-        />
+        {!isEmbedded && (
+          <Leaderboard
+            id={course.id}
+            afterFinish
+            race={() => start(course.course)}
+          />
+        )}
         {save.ghostIsSessionOnly(course.id) && (
           <p role="status">
             Browser storage is full. Your ghost is available for this session.
@@ -356,19 +333,45 @@ export function App({
             </>
           )}
         </h1>
-        <p>
+        <p class="eyebrow">
           {mode === "paused"
             ? (run?.level.name ?? "Movement test room")
-            : "Alice’s Cottage"}
-          <br />
-          {mode === "title" || run?.challenge
-            ? "Search every room for carbon tasks. Tap E at a Lights Out action to complete it."
-            : "Hold E for 3 seconds at lights and inside appliance rings."}
-          <br />
-          WASD to run · Mouse to look · Space to jump
-          <br />
-          Shift or Ctrl to slide · R to restart · Esc to pause
-          <br />
+            : "Chapter 1 · Alice’s Cottage"}
+        </p>
+        <p class="lede">
+          {mode === "title" || run?.challenge ? (
+            <>
+              Search every room for carbon tasks. Tap <kbd>E</kbd> at a Lights
+              Out action to complete it.
+            </>
+          ) : (
+            <>
+              Hold <kbd>E</kbd> for 3 seconds at lights and inside appliance
+              rings.
+            </>
+          )}
+        </p>
+        <ul class="keys" aria-label="Controls">
+          <li>
+            <kbd>W A S D</kbd> run
+          </li>
+          <li>
+            <kbd>Mouse</kbd> look
+          </li>
+          <li>
+            <kbd>Space</kbd> jump
+          </li>
+          <li>
+            <kbd>Shift</kbd> slide
+          </li>
+          <li>
+            <kbd>R</kbd> restart
+          </li>
+          <li>
+            <kbd>Esc</kbd> pause
+          </li>
+        </ul>
+        <p class="pad">
           Controller: A jump · B slide · X interact · Y restart · Start pause
         </p>
         {error && <p role="alert">{error}</p>}

@@ -3,6 +3,7 @@ import R from "@dimforge/rapier3d-compat";
 import challenge from "../public/levels/c1_l1.level.json";
 import source from "./fixtures/prototype.level.json";
 import { parseLevel } from "../src/level/jsonLevel";
+import { cottageBounds } from "../src/level/partitions";
 import { LevelRun } from "../src/level/run";
 import { ringTicks } from "../src/config/ring";
 import { TrainingWorld } from "../src/physics/world";
@@ -100,23 +101,28 @@ it("keeps the footprint exit locked below the savings goal and resets the challe
     run.tick({ pressed, held: pressed });
   }
   try {
-    expect(run.footprintPoints).toBe(10);
-    interactAt(level.leaks[0].pos, false);
-    expect(run.actionAt(run.activeRing)?.points).toBe(1);
-    interactAt(level.leaks[0].pos, true);
-    interactAt(level.leaks[0].pos, true);
-    interactAt(level.leaks[1].pos, true);
+    const goal = run.challenge!;
+    expect(goal.start).toBeGreaterThan(goal.target);
+    expect(run.footprintPoints).toBe(goal.start);
+    const first = level.leaks[0];
+    interactAt(first.pos, false);
+    const points = run.actionAt(run.activeRing)!.points;
+    interactAt(first.pos, true);
+    interactAt(first.pos, true);
+    expect(run.footprintPoints).toBe(goal.start - points);
     interactAt(level.exit, false);
-    expect(run.footprintPoints).toBe(8);
-    expect(run.pointsToOpen).toBe(5);
     expect(run.finished).toBe(false);
-    interactAt(level.leaks[2].pos, true);
-    expect(run.footprintPoints).toBe(3);
-    expect(run.latestCompletion?.type).toBe("laundry");
+    // Clear tasks until the goal is met; the exit opens exactly then.
+    for (const leak of level.leaks.slice(1)) {
+      if (run.exitOpen) break;
+      interactAt(leak.pos, true);
+    }
+    expect(run.footprintPoints).toBeLessThanOrEqual(goal.target);
+    expect(run.latestCompletion).toBeDefined();
     interactAt(level.exit, false);
     expect(run.finished).toBe(true);
     run.reset();
-    expect(run.footprintPoints).toBe(10);
+    expect(run.footprintPoints).toBe(goal.start);
     expect(run.completedActions).toEqual([]);
     expect(run.latestCompletion).toBeUndefined();
     expect(run.exitOpen).toBe(false);
@@ -132,8 +138,9 @@ it("blocks movement through the visible exterior cottage wall", () => {
     for (let i = 0; i < 300; i++)
       world.tick({ x: 1, z: 0, jump: false, slide: false });
     const position = world.body.translation();
-    expect(position.x).toBeGreaterThan(5);
-    expect(position.x).toBeLessThan(6);
+    const { halfWidth } = cottageBounds(level.boxes);
+    expect(position.x).toBeGreaterThan(halfWidth - 1);
+    expect(position.x).toBeLessThan(halfWidth);
     expect(position.y).toBeGreaterThan(0.8);
   } finally {
     world.world.free();

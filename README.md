@@ -16,4 +16,4 @@ At a level’s finish, choose **Next level** or **Back to the Hall of Doors**. R
 
 - `npm test` runs the Wonderland tests. `npm run test:chase` runs the vendored game's tests after its dependencies are installed.
 - `npm --prefix chase run dev` starts the original chase menu for standalone play. Run `npm --prefix chase ci` first if you have not built it through the parent app.
-- `npm run build` builds both games for production. See [chase deployment](chase/docs/DEPLOYMENT.md) for the optional Supabase setup and [level design](chase/docs/LEVEL_DESIGN.md) for course authoring.
+- `npm run build` builds both games for production. See [chase deployment](chase/docs/DEPLOYMENT.md) for the optional Supabase setup (standalone chase only; the chase never contacts Supabase inside Wonderland) and [level design](chase/docs/LEVEL_DESIGN.md) for course authoring.

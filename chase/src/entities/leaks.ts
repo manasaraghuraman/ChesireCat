@@ -1,29 +1,46 @@
 import * as T from "three";
-import { fixture } from "../art/fixtures";
+import { fixture, type Mount } from "../art/fixtures";
+import type { Box } from "../level/testRoom";
+import type { Point } from "../level/jsonLevel";
 import { box, surface } from "../art/cottageMaterials";
 import rules from "../config/leaks.json";
 import type { LevelRun } from "../level/run";
 import { ringTicks } from "../config/ring";
-export function label(text: string) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 640;
-  canvas.height = 96;
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#262019";
-  ctx.roundRect(5, 5, 630, 86, 12);
-  ctx.fill();
+const near = new T.Vector3();
+/** A rounded, readable world-space tag sized to its text; `height` is in metres. */
+export function label(text: string, height = 0.34) {
+  const canvas = document.createElement("canvas"),
+    ctx = canvas.getContext("2d")!,
+    font = "600 44px system-ui, sans-serif",
+    h = 76;
+  ctx.font = font;
+  const w = Math.ceil(ctx.measureText(text).width) + 64;
+  canvas.width = w;
+  canvas.height = h;
+  ctx.font = font;
+  ctx.fillStyle = "rgba(38, 32, 25, 0.92)";
   ctx.strokeStyle = "#bd9a62";
   ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(1.5, 1.5, w - 3, h - 3, (h - 3) / 2);
+  ctx.fill();
   ctx.stroke();
   ctx.fillStyle = "#fff1d1";
-  ctx.font = "bold 36px system-ui";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, 320, 48, 580);
+  ctx.fillText(text, w / 2, h / 2 + 2);
+  const map = new T.CanvasTexture(canvas);
+  map.colorSpace = T.SRGBColorSpace;
+  map.anisotropy = 4;
   const sprite = new T.Sprite(
-    new T.SpriteMaterial({ map: new T.CanvasTexture(canvas) }),
+    new T.SpriteMaterial({ map, transparent: true, depthWrite: false }),
   );
-  sprite.scale.set(3.2, 0.48, 1);
+  sprite.scale.set((height * w) / h, height, 1);
+  // Fade out when the camera is on top of the tag so it never fills the view.
+  sprite.onBeforeRender = (_r, _s, camera) => {
+    const d = camera.position.distanceTo(sprite.getWorldPosition(near));
+    sprite.material.opacity = T.MathUtils.clamp((d - 1.4) / 1.6, 0, 1);
+  };
   return sprite;
 }
 function band(radius: number, width: number, color: number) {
@@ -34,6 +51,36 @@ function band(radius: number, width: number, color: number) {
   mesh.rotation.x = -Math.PI / 2;
   return mesh;
 }
+/** Find the closest wall face to a small task so its fixture can sit flush against it. */
+export function mountFor(
+  boxes: readonly Box[],
+  [x, , z]: Point,
+): Mount | undefined {
+  let best: Mount | undefined,
+    distance = 1.6;
+  for (const b of boxes) {
+    if (b.center[1] - b.size[1] / 2 > 1.2 || b.center[1] + b.size[1] / 2 < 1.6)
+      continue;
+    const [cx, , cz] = b.center,
+      [w, , d] = b.size;
+    const inX = Math.abs(x - cx) <= w / 2,
+      inZ = Math.abs(z - cz) <= d / 2;
+    if (inZ && !inX) {
+      const gap = Math.abs(x - cx) - w / 2;
+      if (gap < distance) {
+        distance = gap;
+        best = { facing: x > cx ? Math.PI / 2 : -Math.PI / 2, gap };
+      }
+    } else if (inX && !inZ) {
+      const gap = Math.abs(z - cz) - d / 2;
+      if (gap < distance) {
+        distance = gap;
+        best = { facing: z > cz ? 0 : Math.PI, gap };
+      }
+    }
+  }
+  return best;
+}
 /** Bind the gray-box pickups, charge arcs and exit seal to the current attempt. */
 export function spawnLeaks(scene: T.Scene, run: LevelRun) {
   const views = run.level.leaks.map((l, i) => {
@@ -41,7 +88,8 @@ export function spawnLeaks(scene: T.Scene, run: LevelRun) {
     group.position.set(...l.pos);
     scene.add(group);
     const big = l.kind === "big";
-    const prop = fixture(l.type, big);
+    const mount = big ? undefined : mountFor(run.level.boxes, l.pos);
+    const prop = fixture(l.type, big, mount);
     group.add(prop.model);
     const stars = new Float32Array(24 * 3);
     for (let i = 0; i < 24; i++) {
@@ -72,8 +120,15 @@ export function spawnLeaks(scene: T.Scene, run: LevelRun) {
           ? name
           : "Optional · " + name,
     );
-    sign.position.set(big ? 1.55 : 0.5, big ? 2.23 : 0.97, 0);
-    sign.scale.set(2.25, 0.34, 1);
+    if (mount) {
+      // Float the tag just in front of the fixture, toward the room.
+      const out = 0.45 - mount.gap;
+      sign.position.set(
+        Math.sin(mount.facing) * out,
+        l.type === "light" ? 0.75 : 0.95,
+        Math.cos(mount.facing) * out,
+      );
+    } else sign.position.set(big ? 1.55 : 0.5, big ? 2.23 : 0.97, 0);
     group.add(sign);
     const arc = band(rules.ringRadius, 0.13, 0xc897ff);
     if (big) {
@@ -153,6 +208,7 @@ export function spawnLeaks(scene: T.Scene, run: LevelRun) {
         v.burst.material.opacity = 1 - age;
       }
       v.prop.setComplete(done);
+      v.prop.animate?.(run.worldTicks / 120);
       v.sign.visible = !done;
       v.arc.geometry.setDrawRange(
         0,

@@ -1,33 +1,33 @@
 {
   "c1_l1": {
     "name": "Lights Out",
-    "minTicks": 360,
-    "required": 2,
-    "optionalCuts": [0.2]
+    "minTicks": 480,
+    "required": 13,
+    "optionalCuts": []
   },
   "c1_l2": {
     "name": "Under the Sink",
-    "minTicks": 360,
-    "required": 2,
-    "optionalCuts": [0.2]
+    "minTicks": 2460,
+    "required": 16,
+    "optionalCuts": []
   },
   "c1_l3": {
     "name": "The Boiler Room",
-    "minTicks": 360,
-    "required": 2,
-    "optionalCuts": [0.2]
+    "minTicks": 2460,
+    "required": 15,
+    "optionalCuts": []
   },
   "c1_l4": {
     "name": "Laundry Leap",
-    "minTicks": 360,
-    "required": 2,
-    "optionalCuts": [0.2]
+    "minTicks": 3420,
+    "required": 17,
+    "optionalCuts": []
   },
   "c1_l5": {
     "name": "Last Call at the Cottage",
-    "minTicks": 1080,
-    "required": 3,
-    "optionalCuts": [0.2]
+    "minTicks": 4200,
+    "required": 22,
+    "optionalCuts": []
   },
   "power_lab": {
     "name": "Power-up lab",
